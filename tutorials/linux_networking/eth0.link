@@ -1,0 +1,35 @@
+# Adapt this file to your needs and place it under 
+# /etc/systemd/network/
+# Remember to add to your kernel boot parameters net.ifnames="0"
+
+# Matching on MAC address might not be the best strategy.
+ 
+[Match]
+#       MACAddress=12:23:56:AB:CD:EF
+#       Driver=e1000
+#As exposed by ID_NET_DRIVER
+#       Path=pci-0000:02:00.0-*
+#As exposed by the udev property ID_PATH
+#       Type=wlan
+#As exposed by networkctl status
+#	Property=
+#You can use this one to match on udev properties with their values
+#Ex: Property= ID_MODEL_ID=99 "ID_VENDOR_FROM_DATABASE=vendor name"
+
+[Link]
+	Description="my lovely eth0"
+#	Alias=
+	MACAddressPolicy=none
+#	MACAddressPolicy = persistent|random|none
+        MACAddress=cb:a9:87:65:43:21
+        Name=eth0
+        MTUBytes=1500
+        BitsPerSecond=1000M
+	Duplex=full
+	AutoNegotiation=yes
+        WakeOnLan=magic
+#	ReceiveChecksumOffload=yes
+#	TransmitChecksumOffload=yes
+#	TCPSegmentationOffload=yes
+
+
