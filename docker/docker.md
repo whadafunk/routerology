@@ -17,7 +17,6 @@
 - EXPOSE
 
 
-## Here are some details of the Dockerfile commands
 
 > Pay attention that many of the docker commands (including COPY) have shell and exec forms
 > Commands that you run in exec mode do not pass through a shell and there are a couple effects
@@ -25,6 +24,8 @@
 - If you want to run command with a different shell you can do that with RUN ["/bin/bash", "-c", "echo hello"]
 - If CMD is used to pass arguments to the ENTRYPOINT command, then both commands should be specified in json format
 - When you are using the shell format any runtime arguments will be ignored
+
+## Here are some details of the Dockerfile commands
 
 - **FROM**  -> *FROM alpine:latest*
 - **MAINTAINER** -> *MAINTAINER gri.daniel@gmail.com*
