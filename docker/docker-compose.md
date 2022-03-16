@@ -18,7 +18,7 @@
 >    image:  
 >    volumes:  
 >    environment:  
->    network: *this was added in version 3.4*  
+>    networks: *this was added in version 3.4*  
 >    volumes:  
 >    ports:  
 >    command:  
@@ -41,7 +41,7 @@ No Dashes Means that they are Key Value Pairs to a Dictionary.
     A dictionary is represented in a simple key: value form
 
 martin:  
-  name: Martin D'vloper  
+  name: Martin Developer  
   job: Developer  
   skill: Elite  
 
@@ -78,7 +78,7 @@ environment:
 
 >docker-compose up starts services in dependency order. In the following example, db and redis are started before web.  
 >docker-compose up SERVICE automatically includes SERVICE’s dependencies. In the example below, docker-compose up web also creates and starts db and redis.  
-> docker-compose stop stops services in dependency order. In the following example, web is stopped before db and redis.
+>docker-compose stop stops services in dependency order. In the following example, web is stopped before db and redis.
 
 
 **restart_policy:** -> this is a new stanza that replaces restart 
@@ -122,7 +122,7 @@ environment:
   \- some-network  
   \- other-network  
 
-**ipv4_address:** 1.2.3.4  
+ipv4_address: 1.2.3.4 -> this option should be placed inside a network section 
 
 **logging:**  
  driver: syslog | json-file  
@@ -172,4 +172,10 @@ environment:
 	driver: default  
 	config:  
 	- subnet: 192.168.1.0/24  
-	- gateway: 192.168.1.1  
+	gateway: 192.168.1.1 -> this is only supported in version 2 
+
+*You can define a default network like this*
+networks:  
+  default:  
+    external:  
+      name: my-pre-existing-network
