@@ -1,7 +1,7 @@
-# A couple of thouths and lessons I learned from using docker
+# A couple of thoughts and lessons I learned from using docker
 
 - You might want to have peristency either for the config or the data of the app inside the container
-- For data persistency you woul usualy use a volume. Something like *docker run -v ./www_data:/var/www/html*
+- For data persistency you would usualy use a volume. Something like *docker run -v ./www_data:/var/www/html*
 - The same volume technique can be used for persistency of a config file *docker run -v ./httpd.conf:/etc/httpd/httpd.conf*
 	- The volume technique used above has the advantage that you can modify the persistent data (config or appdata)
 	from the main userspace, and you might not even have to restart the container
