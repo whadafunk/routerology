@@ -1,0 +1,72 @@
+# cat /usr/share/doc/dhcp*/dhcpd.conf.sample
+
+
+# option definitions common to all supported networks...
+option domain-name "sandbox.lab";
+option domain-name-servers ns1.sandbox.lab, sandbox.lab;
+
+default-lease-time 600;
+max-lease-time 7200;
+ddns-update-style none;
+
+# If this DHCP server is the official DHCP server for the local
+# network, the authoritative directive should be uncommented.
+#authoritative;
+
+log-facility local7;
+
+# No service will be given on this subnet, but declaring it helps the
+# DHCP server to understand the network topology.
+
+subnet 10.152.187.0 netmask 255.255.255.0 {
+}
+
+subnet 192.168.40.0 netmask 255.255.255.0 {
+  range 192.168.40.128 192.168.40.254;
+  option routers 192.168.40.1, 192.168.40.2;
+}
+
+
+# A slightly different configuration for an internal subnet.
+subnet 192.168.50.0 netmask 255.255.255.0 {
+  range 192.168.50.10 192.168.50.126;
+  option domain-name-servers 192.168.50.1;
+  option domain-name "sandbox.lab";
+  option netbios-name-server 192.168.50.1
+  option routers 192.168.50.1;
+  option broadcast-address 192.168.50.255;
+  option ntp-server 192.168.50.1;
+  default-lease-time 600;
+  max-lease-time 7200;
+}
+
+host caju {
+  hardware ethernet 01:20:c0:5a:a3:5e;
+  filename "server.boot";
+  server-name "caju.sandbox.lab";
+}
+
+# The fixed address specified here should be outside of the range
+# of dynamically available addresses
+
+host macaron {
+  hardware ethernet 03:90:a7:2f:a0:81;
+  fixed-address 192.168.50.129;
+}
+
+shared-network 224-29 {
+  subnet 10.17.224.0 netmask 255.255.255.0 {
+    option routers rtr-224.example.org;
+  }
+  subnet 10.0.29.0 netmask 255.255.255.0 {
+    option routers rtr-29.example.org;
+  }
+  pool {
+    allow members of "foo";
+    range 10.17.224.10 10.17.224.250;
+  }
+  pool {
+    deny members of "foo";
+    range 10.0.29.10 10.0.29.230;
+  }
+}
