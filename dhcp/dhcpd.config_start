@@ -1,0 +1,37 @@
+#Generic options not specially related to a network
+
+
+default-lease-time 600;
+max-lease-time 7200;
+
+authoritative;
+#not authoritative;
+ddns-update-style interim;
+log-facility local7;
+pid-file-name /var/run/dhcpd.pid;
+lease-file-name /var/lib/dhcpd/dhcpd.leases;
+ping-check;
+
+
+#Global options valid for all networks and pool
+#Can be overriden a subnet/host/pool level
+
+option domain-name "packets.lab";
+option domain-name-servers ns1.packets.lab;
+option domain-search "packets.lab", "packets.net";
+option ntp-servers 1.2.3.4, 1.2.3.5;
+
+#Other options that can be set or read
+
+#option routers 192.168.1.1, 192.168.1.2;
+#option subnet-mask 255.255.255.0;
+#option host-name "mypc";
+#option broadcast-address 192.168.1.255;
+#option dhcp-client-identifier "pc_id";
+#option interface-mtu 1500;
+#option ip-forwarding;
+#option user-class "myUserclass";
+#option vendor-class-identifier "myVendor";
+
+
+
