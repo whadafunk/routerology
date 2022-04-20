@@ -1,12 +1,11 @@
-#Generic options not specially related to a network
-
+#Generic options not specially related to a network, subnet or pool
 
 default-lease-time 600;
 max-lease-time 7200;
 
 authoritative;
 #not authoritative;
-ddns-update-style interim;
+deny-bootp;
 log-facility local7;
 pid-file-name /var/run/dhcpd.pid;
 lease-file-name /var/lib/dhcpd/dhcpd.leases;
@@ -21,17 +20,107 @@ option domain-name-servers ns1.packets.lab;
 option domain-search "packets.lab", "packets.net";
 option ntp-servers 1.2.3.4, 1.2.3.5;
 
+#Dynamic DNS Updates
+#The following two ddns options are normally used by adhoc dns update method
+#ddns-hostname unknown_host;
+#ddns-domainname packets.lab;
+#
+#ddns-update-style interim;
+#allow client-updates;
+
+
 #Other options that can be set or read
 
 #option routers 192.168.1.1, 192.168.1.2;
 #option subnet-mask 255.255.255.0;
 #option host-name "mypc";
 #option broadcast-address 192.168.1.255;
+#option netbios-nameservers 192.168.1.4;
 #option dhcp-client-identifier "pc_id";
 #option interface-mtu 1500;
 #option ip-forwarding;
 #option user-class "myUserclass";
 #option vendor-class-identifier "myVendor";
+#next-server 192.168.1.1;
+#filename "boot.gz";
+#fixed-address 192.168.1.10;
+#hardware ethernet 11:22:33:12:23:34;
+#
 
+# Simple subnet
+	subnet 192.168.0.0 netmask 255.255.255.0 {
+		range 192.168.0.128 - 192.168.0.150;
+		option subnet-mask 255.255.255.0;
+		option broadcast-address 192.168.0.255
+		option routers 192.168.0.1;
+		option domain-name lan.net;
+		option domain-name-servers 8.8.8.8;
+		option domain-search packets.lab boxes.net;
+	}
 
+# Shared networks on a single interface
+	
+	shared-network lan_networks {
+		subnet 172.16.0.0 netmask 255.255.255.0 {
+			range 172.16.0.100 - 172.16.0.200;
+			option subnet-mask 255.255.255.0;
+			option routers 172.16.0.1;
+			allow unknown-clients;
+			
+		}
+		subnet 172.16.1.0 netmask 255.255.255.0 {
+			range 172.16.1.100 - 172.16.1.200;
+			option subnet-mask 255.255.255.0;
+			option routers 172.16.1.1;
+			deny unknown-clients;
+		}
+	}
 
+# Expanding on the previous shared-network stanza we can add some host definitions
+
+	group {
+		next-server 192.168.1.5;
+		server-name "boot.packets.lab";
+		filename "boot.gz";
+
+		host pc1.packets.lab {
+			hardware ethernet 12:23:34:11:22:33;
+			fixed-address 176.16.1.10;
+			}
+
+# pc2 will get an address from subnet 172.16.1.0
+#
+		host pc2.packets.lab {
+			hardware ethernet 12:12:12:aa:bb:cc;
+			option host-name pc2;
+			option dhcp-client-identifier "pc2";
+			}
+		}
+	
+# Multiple pools on a shared network
+# If you're going to use multiple pools on the same network interface
+# the best way to do it is to configure a subnet only for the topology definition
+# and then configure the range under the pools
+#
+	shared-network pooled_networks {
+		subnet 10.10.0.0 netmask 255.255.255.0 {
+			option domain-name-servers 8.8.8.8 8.8.4.4;
+		}
+
+		pool red_team {
+			range 10.10.1.10 - 10.10.1.100;
+			option routers 10.10.1.1 10.10.1.2;
+			option subnet-mask 255.255.255.0;
+			option domain-name red_team.lab;
+			allow members of "red_ream";
+			deny members of "blue_team";
+		}
+
+		pool blue_team {
+			range 10.10.2.10 - 10.10.2.100
+			option routers 10.10.2.1 10.10.2.2;
+			option subnet-mask 255.255.255.0;
+			option domain-name bule_team.lab;
+			allow members of "blue_team";
+			deny members of "red_team";
+		}	

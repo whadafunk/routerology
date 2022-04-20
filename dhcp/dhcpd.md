@@ -3,24 +3,34 @@
 
 DHCPD uses mainly two files:
 
-- The configuration file */etc/dhcp/dhcpd.conf*
-- The lease database file */var/lib/dhcpd/dhcpd.leases*
+- The configuration file */etc/dhcp/dhcpd.conf*  
+- The lease database file */var/lib/dhcpd/dhcpd.leases*  
 
-The configuration file uses two types of statements that can be:
+The configuration file uses two types of statements that can be:  
 
 - declarations
 - parameters
 
 The declarations are the ones that describe the network topology.  
-The parameters are telling the server how to do specific things,
-and they often have values for time, quantity, etc
+The parameters are telling the server how to do specific things,  
+and they often have values for time, quantity, etc  
+
+The configuration aspects of DHCP server revolves arround these topics:
+
+-Define the network topology using subnet declarations
+-Define the addresses available for dynamic allocation by using range declarations under subnet or pool
+-Define other dhcp options like default-router, domain-name, domain-name-servers, mtu, netmask, broadcast
+-Group subnet,pool, and host declarations under Group or Shared-Network declarations
+-Identify DHCP request by using dhcp options like vendor class or client class, or other options
+-Differentiate how requests are serviced by using classes, subclasses and pools
 
 The basic building block is the *subnet* declaration.  
 The subnet identifies a connected subnet for the dhcp server, so we need to have at least one subnet
 for each network interface of the server, even if we don't allocate ip addresses from each of these networks.
 
 If we want to allocate ips dynamically from a specific subnet then under that subnet declaration we need
-to have a *range* declaration with the available ips
+to have a *range* declaration with the available ips  
+You can have multiple *range* declaration under the same subnet or pool
 
 If we server more than one subnet from under a single network interface, then those subnet declarations need
 to be enclosed under *shared-network*
@@ -53,11 +63,17 @@ configure these parameters only once for all the group.
 The last important declaration is the pool, which can be used to differentiate multiple types of hosts under the same subnet. You configure specific options for the pool and use allow and deny statements to match clients on specific pool.  
 For example you can use allow knonwn-clients, which means that the pool matches only the clients that have matching host declarations in your config.
 
-I'm not entirely sure about the correct way to place pool in the config. It seems that you can enclose pool inside the subnet declaration,  
-but you can also put it outside subnet, in which case you need to include a range statement enclosed inside pool.
+*I'm not entirely sure about the correct way to place pool in the config. It seems that you can enclose pool inside the subnet declaration,  
+but you can also put it outside subnet, in which case you need to include a range statement enclosed directly inside pool.*
+
+When a client is to be booted, its boot parameters are determined by consulting that client's host declaration (if any),  
+ and then consulting any class declarations matching the client, followed by the pool, subnet and shared-network declarations
+ for the IP address assigned to the client.
+Scopes are never considered twice, and if parameters are declared in more than one scope,
+ the parameter declared in the most specific scope is the one that is used. 
+
 
 ### A quick example of dhcpd.conf structure
-
 
 \# Global Options
 option domain-name "sandbox.lab";  
@@ -123,14 +139,14 @@ if option dhcp-user-class = "something" {
 
 - Equality - expression1 == expression2  
 - Regex, and case-insensitive Regex - expression1 ~= expression2; expression1 ~~ expression2  
-- Boolean comparison - and, or
-- Not
+- Boolean comparison operators AND, and OR
+- Negation operator Not
 - Exists - exists option-name
 - Known - returns true if the client whose request is being processed is known
-- substring (data-expr, offset, length)
-- suffix (data-expr, length)  
-- lcase (data-expr)  
-- ucase (data-expr)  
+- substring (data-expr, offset, length) - this is used to extract a string from a dhcp option
+- suffix (data-expr, length) - this also extracts a string from a dhp option but only from the end
+- lcase (data-expr)  - transform to lowercase
+- ucase (data-expr)  - transform to uppercase
 - pick-first-value(data-expr1 [...exprn])  
 
 ## DHCP Dynamic updates
@@ -143,9 +159,11 @@ First of all we need to configure the update mechanisms. We can choose between a
 - ddns-domain-name *name*
 - ddns-hostname *name*
 
+*the ddns-domain-name and ddns-hostname are used mostly for ad-hoc update*
+
 If DNS only allows secure updates, then we also need to configure the key
 
-key DHCP_UPDATER {  
+key DHCP\_UPDATER {  
 	algorithm hmac-md5;  
 	secret 03r92j09j203fj20fwe;  
 };  
@@ -168,16 +186,17 @@ You can use classes to match on different request, as an alternative to have opt
 
 Classes can work in two modes:
 
-- You declare a class and a condition to match for that class, and then you use the class name in allow statements under pool
-- You declare a class but specify only a parameters to be matched on by an aditional declaration, called subclass. In this case,
+- You declare a class and a condition to match for that class (most of the times you will use an if condition),  
+ and then you use the class name in allow statements under pool
+- You declare a class but specify only a parameter to be matched on by an aditional declaration, called subclass. In this case,
 you can either configure custom options directly under the subclass, or use the subclass name in an allow statement under a pool.  
 
 
 ### Ex1:
 
-class "clients-a" {
- match if substring ( option dhcp-client-identifier, 1, 3) = "RAS";
-}  
+class "clients-a" {  
+ match if substring ( option dhcp-client-identifier, 1, 3) = "RAS";  
+}   
 
 pool  clients-a {  
 	allow members of "clients-a";  
@@ -202,6 +221,7 @@ pool clients-red" {
 	allow members of "clients-red";  
 	}   
 
+The data following the class name in the subclass declaration is a constant value to use in matching the match expression for the class. When class matching is done, the server will evaluate the match expression and then look the result up in the hash table. If it finds a match, the client is considered a member of both the class and the subclass. 
 
 ## Configuration elements reference:
 
