@@ -1,6 +1,8 @@
 -4 | -6 -> select ipv4 or ipv6
 -p -> select a custom port other than 67/udp
 -cf -> select alternative config file
+-pf -> pid file
+-lf -> alternative lease file
 -f -> put in foreground
 -d -> output to stderr; this option implies -f
 -q -> skip licensing message on startup

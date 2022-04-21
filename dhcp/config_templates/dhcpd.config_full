@@ -20,13 +20,32 @@ option domain-name-servers ns1.packets.lab;
 option domain-search "packets.lab", "packets.net";
 option ntp-servers 1.2.3.4, 1.2.3.5;
 
-#Dynamic DNS Updates
-#The following two ddns options are normally used by adhoc dns update method
+# Dynamic DNS Updates
+# The following two ddns options are normally used by adhoc dns update method
 #ddns-hostname unknown_host;
 #ddns-domainname packets.lab;
-#
+
+# The ddns-update style can be interim, ad-hoc, or none
 #ddns-update-style interim;
+# With interim style you can permit clients to update dns on their own
 #allow client-updates;
+# If you want to update a secure DNS you need to specify the TSIG key
+
+#key DHCP\_UPDATER {
+#	algorithm hmac-md5;
+#	secret 03r92j09j203fj20fwe;
+#};
+#
+#zone example.org {
+#	primary 127.0.0.1;
+#	key DHCP_UPDATER;
+#};
+#
+#zone 17.127.10.in-addr.arpa {
+#	primary 127.0.0.1;
+#	key DHCP_UPDATER;
+#}
+
 
 
 #Other options that can be set or read
@@ -35,7 +54,7 @@ option ntp-servers 1.2.3.4, 1.2.3.5;
 #option subnet-mask 255.255.255.0;
 #option host-name "mypc";
 #option broadcast-address 192.168.1.255;
-#option netbios-nameservers 192.168.1.4;
+#option netbios-name-servers 192.168.1.4;
 #option dhcp-client-identifier "pc_id";
 #option interface-mtu 1500;
 #option ip-forwarding;
@@ -46,6 +65,11 @@ option ntp-servers 1.2.3.4, 1.2.3.5;
 #fixed-address 192.168.1.10;
 #hardware ethernet 11:22:33:12:23:34;
 #
+#
+# Custom Option Definition
+#
+#option sql-server-address code 193 = ip-address;
+#option sql-server-address sql.example.com;
 
 # Simple subnet
 	subnet 192.168.0.0 netmask 255.255.255.0 {
@@ -99,7 +123,7 @@ option ntp-servers 1.2.3.4, 1.2.3.5;
 	
 # Multiple pools on a shared network
 # If you're going to use multiple pools on the same network interface
-# the best way to do it is to configure a subnet only for the topology definition
+# the best way to do it is to configure subnets only for the topology definition
 # and then configure the range under the pools
 #
 	shared-network pooled_networks {
@@ -124,3 +148,13 @@ option ntp-servers 1.2.3.4, 1.2.3.5;
 			allow members of "blue_team";
 			deny members of "red_team";
 		}	
+
+# The pools above use class acls, so we define the classes bellow
+
+class "pooled" {  
+ match substring ( option dhcp-client-identifier, 1, 5);  
+}  
+subclass "blue_team" "blues";  
+subclass "red_ream" "redis";  
+subclass "brown_team" "brown" ;
+

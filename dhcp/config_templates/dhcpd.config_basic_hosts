@@ -1,0 +1,56 @@
+#Generic options not specially related to a network, subnet or pool
+
+default-lease-time 600;
+max-lease-time 7200;
+
+authoritative;
+#not authoritative;
+deny-bootp;
+log-facility local7;
+pid-file-name /var/run/dhcpd.pid;
+lease-file-name /var/lib/dhcpd/dhcpd.leases;
+ping-check;
+
+#Global options valid for all networks and pool
+#Can be overriden a subnet/host/pool level
+
+option domain-name "packets.lab";
+option domain-name-servers 192.168.40.5;
+option domain-search "packets.lab" "packets.net";
+option ntp-servers 0.pool.ntp.org 1.pool.ntp.org;
+
+# Dynamic DNS Updates
+ddns-update-style interim;
+allow client-updates;
+
+# Simple subnet
+	subnet 192.168.40.0 netmask 255.255.255.0 {
+		range 192.168.40.128 - 192.168.40.150;
+		option subnet-mask 255.255.255.0;
+		option broadcast-address 192.168.40.255
+		option routers 192.168.40.1;
+		option domain-name packets.lab;
+		option domain-name-servers 192.168.40.5;
+		option netbios-nameserver 192.168.40.5;
+		option interface-mtu 1500;
+		option ip-forwarding;
+		option domain-search packets.lab boxes.lab;
+	}
+
+# Specific hosts
+# We also use the group declaration in case we have options common to all hosts
+
+	group {
+		host pc1 {
+			hardware ethernet aa:bb:cc:dd:ee:ff;
+			fixed-address 192.168.41.10;
+			filename "boot.gz";
+			next-server 192.168.40.10;
+			option host-name pc1;
+			option dhcp-client-identifier "PC_A";
+		}
+		host pc2 {
+			hardware ethernet ab:bc:cd:ef:fe:dc;
+			fixed-address 192.168.41.11;
+		}
+	}

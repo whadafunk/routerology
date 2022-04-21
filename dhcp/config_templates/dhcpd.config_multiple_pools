@@ -1,0 +1,81 @@
+#Generic options not specially related to a network, subnet or pool
+
+default-lease-time 600;
+max-lease-time 7200;
+
+authoritative;
+#not authoritative;
+deny-bootp;
+log-facility local7;
+pid-file-name /var/run/dhcpd.pid;
+lease-file-name /var/lib/dhcpd/dhcpd.leases;
+ping-check;
+
+
+#Global options valid for all networks and pool
+#Can be overriden a subnet/host/pool level
+
+option domain-name "packets.lab";
+option domain-name-servers 192.168.40.5;
+option domain-search "packets.lab" "packets.net";
+option ntp-servers 0.pool.ntp.org 1.pool.ntp.org;
+
+# Dynamic DNS Updates
+ddns-update-style interim;
+allow client-updates;
+
+# Custom Option Definition
+
+#option sql-server-address code 193 = ip-address;
+#option sql-server-address sql.example.com;
+
+
+	shared-network pooled_networks {
+
+		subnet 192.168.40.0 netmask 255.255.255.0 {
+			option subnet-mask 255.255.255.0;
+			option broadcast-address 192.168.40.255;
+			option routers 192.168.40.1;
+			option domain-name packets.lab;
+			option domain-name-servers 192.168.40.5;
+			option netbios-name-servers 192.168.40.5;
+			option interface-mtu 1500;
+			option ip-forwarding;
+			option domain-search packets.lab boxes.lab;
+		}
+
+		pool bulk_clients {
+			range 192.168.40.100 - 192.168.40.150;
+			option subnet-mask 255.255.255.0;
+			option routers 192.168.40.1;
+			allow unknown-clients; 
+		}
+
+		pool known_clients {
+			range 10.10.2.10 - 10.10.2.100
+			option subnet-mask 255.255.255.0;
+			option routers 10.10.2.1 10.10.2.2;
+			deny unknown-clients;
+		}	
+
+
+	group {
+		next-server 192.168.1.5;
+		server-name "boot.packets.lab";
+		filename "boot.gz";
+
+		host pc1.packets.lab {
+			hardware ethernet 12:23:34:11:22:33;
+			fixed-address 192.168.41.10;
+			option host-name "pc1";
+			option dhcp-client identifier "pc_a";
+			filename "boot.gz";
+			next-server 192.168.40.10;
+			}
+
+		host pc2.packets.lab {
+			option host-name pc2;
+			option dhcp-client-identifier "pc2";
+			}
+		}
+	

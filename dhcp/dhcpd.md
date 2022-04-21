@@ -282,6 +282,22 @@ The data following the class name in the subclass declaration is a constant valu
 - option user-class *string*
 - option vendor-class-identifier *string*
 
+New options are declared as follows:
 
+*option new-name code new-code = definition ;*   
+
+The values of new-name and new-code should be the name you have chosen for the new option and the code you have chosen.  
+The definition should be the definition of the structure of the option. 
+
+### Examples of custom DHCP options:
+
+- option use-zephyr code 180 = boolean;
+- option use-zephyr on;
+
+- option sql-server-address code 193 = ip-address;
+- option sql-server-address sql.example.com;
+
+- option sql-default-connection-name code 194 = text;
+- option sql-default-connection-name "PRODZA";
 
 
