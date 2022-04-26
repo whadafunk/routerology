@@ -88,7 +88,7 @@ shared-network 192-168 {
 		option routers 192.168.0.1, 192.168.0.2;  
 		pool pool1 {  
 			range 192.168.0.200 192.168.0.210;
-			allow known-clients; 
+			allow known-clients;  
 		  }  
 		pool pool2 {  
 			range 192.168.0.220 192.168.0.230;
