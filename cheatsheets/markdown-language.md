@@ -41,3 +41,7 @@ This 4th line should be on its own because we have two spaces at the end of the 
 ```
 
 [This should be a link](https://guitarshop.ro "GUITARSHOP")
+
+If you want to insert an image, the syntax is very similar to that of a link
+
+![Link Name](./img "hoover over title")

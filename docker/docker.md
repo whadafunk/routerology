@@ -37,7 +37,7 @@
 - **RUN** 
 	- *RUN echo "hello world"* -> this is the shell form
 	- *RUN ["echo","hello world"]* - this is the exec form which is not passed through a shell
-	- Most of the times RUN is used to install apps with apt or dnf -> *dnf -y install vim*
+	- Most of the times RUN is used to install apps with apt or dnf, and is used in the shell form -> *dnf -y install vim*
 - **COPY src dst** -> *COPY /home/user/docker/file /opt file* -> it will copy the file to the container /opt directory
 - **COPY --chown=user:group source destination
 - **WORKDIR** -> sets the workdir for all the following RUN commands

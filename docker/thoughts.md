@@ -28,3 +28,19 @@ and assign GRANT ALL to the created user on the created database
 - MARIADB_PASSWORD
 
 *$ docker run --detach --name some-mariadb --env MARIADB_USER=example-user --env MARIADB_PASSWORD=my_cool_secret --env MARIADB_ROOT_PASSWORD=my-secret-pw  mariadb:latest*
+
+# Runtime container params
+
+Some of the commands of the docker file are used when starting the container, and they do not produce changes in the storage layer at build time.
+These commands are: 
+
+- Environment variables
+- User ID of the running process
+- Exposed Ports
+- Volume
+
+
+# User and Group IDs
+
+
+# By 
