@@ -14,6 +14,7 @@
 - asset number
 - technical owner
 - business owner
+- list of hosted services and their URIs
 - disk partitions
 - physical resources (cpu/memory/disk)
 - physical location, or if a container/vm the virtual location (hostname - ip)
@@ -52,11 +53,14 @@
 	> review content of /etc/ca-certificates.conf
 	> run dpkg-reconfigure ca-certificates
 	> run update-ca-certificates
+- copy the wildcard certificate under /etc/ssl/
 
 ### System services
 
 - install openssh if not installed already
 - review sshd configuration
+- configure ssh banner message
+- configure /etc/motd (you can create a symbolic link to /var/log/admin/summary)
 - install and configure fail2ban
 - install and configure tripwire
 - install backup & configure backup agent

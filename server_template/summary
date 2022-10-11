@@ -1,0 +1,41 @@
+ ____  _ _       ____         __ _     ____            _
+| __ )(_) |_    / ___|  ___  / _| |_  / ___| _   _ ___| |_ ___ _ __ ___  ___
+|  _ \| | __|___\___ \ / _ \| |_| __| \___ \| | | / __| __/ _ \ '_ ` _ \/ __|
+| |_) | | ||_____|__) | (_) |  _| |_   ___) | |_| \__ \ ||  __/ | | | | \__ \
+|____/|_|\__|   |____/ \___/|_|  \__| |____/ \__, |___/\__\___|_| |_| |_|___/
+                                             |___/
+============================================================================
+
+LAST_UPDATE:            11/10/2022
+HOSTNAME:               docks.bit-soft.ro
+ASSET NR:               xxx.yyy
+BUSINESS OWNER:         Nobody
+TECHNICAL OWNER:        Internal-IT
+LOCATION:               VM127(docks) on Proxmox Environment
+DESCRIPTION:            Docker environment running mostly web applications behind NGINX Proxy Manager
+SERVICES:
+			- https://portadocks.bit-soft.ro
+			- https://npm.bit-soft.ro
+			- https://intranet.bit-soft.ro
+USAGE:
+                        /var/docks/_container_name_
+                        docker container ls
+                        docker container start _container_name_
+ACTIVE-USERS:
+        root: user/password, ssh-key
+        admin:  user/password, ssh-key
+NETWORK-CONFIG:
+        IP:192.168.100.135/23
+        GW:192.168.101.1
+        DNS:192.168.100.11
+        DOMAIN:bit-soft.ro
+CONNECTED-NETWORKS:
+        eth0@if45        UP             192.168.100.135/23
+        docker0          DOWN           172.17.0.1/16
+        br0              UP             172.16.100.1/23
+
+DISK PARTITIONS:
+        /dev/mapper/iscsi_lvm_grp-vm--127--disk--0  20466256 7146144  12255152  37% /
+
+==============================================================================
+
