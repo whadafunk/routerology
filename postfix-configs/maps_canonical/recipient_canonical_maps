@@ -1,0 +1,13 @@
+# Syntax Rules:
+# 1 to 1 corespondence between key and address
+# user@domain		address
+# In this case the user@domain is replaced by address only
+# if the @domain part is equal to something listed in
+# mydestination, inet_interfaces or proxy_interfaces
+# user			address
+# This last form is a wildcard, and all the addresses in the domain
+# will be replaced with the one address specified 
+# *** When this last form is used, the postfix SMTP server will
+# accept mail for any recipient in domain, regardles if that recipient
+# exists.
+# @domain		address

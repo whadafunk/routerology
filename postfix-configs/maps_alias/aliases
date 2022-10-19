@@ -1,0 +1,13 @@
+# See man 5 aliases for format
+# The generic syntax follows these rules:
+# local_withouth_domain:	address1[, address2, address3]
+# local_withouth_domain:	|command1, |command2
+# local_without_domain		/path/to/file
+# local_without_domain		:include:/file/name
+#
+#admin:		postmaster
+#all-users:	john,daniel,maria,alexandra
+#fax:		|/usr/sbin/fax
+#fileaddress:	/var/spool/postfix/file_pool
+#some_more:	:include:/etc/postfix/others
+postmaster:    	root

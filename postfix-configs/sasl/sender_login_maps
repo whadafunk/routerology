@@ -1,0 +1,20 @@
+#    Optional lookup table with the SASL login names that own the sender (MAIL FROM) addresses.
+
+#    Specify zero or more "type:name" lookup tables, separated by whitespace or comma. 
+#    Tables will be searched in the specified order until a match is found. 
+#    With lookups from indexed files such as DB or DBM, or from networked tables such as NIS, LDAP or SQL, 
+#    the following search operations are done with a sender address of user@domain:
+
+#    1) user@domain
+#        This table lookup is always done and has the highest precedence. 
+#    2) user
+#        This table lookup is done only when the domain part of the sender address matches $myorigin, $mydestination, $inet_interfaces or $proxy_interfaces. 
+#    3) @domain
+#        This table lookup is done last and has the lowest precedence. 
+
+#    In all cases the result of table lookup must be either "not found" or a list of SASL login names separated by comma and/or whitespace.
+
+# Ex: 
+
+# daniel@packets.lab			daniel.grigore@packets.lab, daniel@packets.lab, daniel
+

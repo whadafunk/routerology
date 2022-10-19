@@ -1,0 +1,5 @@
+# This should be just a simple list with valid addresses on the LHS
+# and a generic value on RHS
+john.doe@packets.lab            true
+joan.jett@packets.lab           true
+admin@packets.lab               true

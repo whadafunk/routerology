@@ -1,0 +1,49 @@
+# TABLE FORMAT
+#  The input format for the postmap(1) command is as follows:
+#    pattern action
+#         When  pattern  matches  a  mail address, domain or host address,
+#         perform the corresponding action.
+#    blank lines and comments
+#         Empty lines and whitespace-only lines are ignored, as are  lines
+#         whose first non-whitespace character is a `#'.
+#    multi-line text
+#         A  logical  line  starts  with  non-whitespace text. A line that
+#         starts with whitespace continues a logical line.
+
+# The LHS Key can be one of the following:
+#
+# Email Address
+# DNS hostname
+# IP address, full/partial/wildcard
+# Look at the following examples:
+# 
+# user@domain -> domain.ltd -> .domain.ltd ( the subdomain matching
+#	depends on the parent_domain_matches_subdomains )
+# user@ - matches all mail addresses with the specified user part
+# domain.ltd -> .domain.ltd -> net.work.addr.ess -> net.work.addr
+# net.work -> net
+
+# The actions accepted on the RHS are the following:
+# OK 
+# DUNNO
+# DEFER optional text
+# REJECT optional text
+# DISCARD optional log_text
+# PREPEND headername:headervalue
+# REDIRECT user@domain
+# FILTER transport:destination
+# BCC user@domain
+# 4NN text
+# 5NN text
+# HOLD optional log_text
+# DEFER_IF_PERMIT optional text
+# DEFER_IF_REJECT optional text
+# INFO optional log_text
+# WARN optional log_text
+
+193.231.230			DISCARD "smtp bogon network attempt"
+john@packets.local		OK
+justin@packets.local		DUNNO
+black.hole			DISCARD
+confidential@packets.lab	BCC archive@packets.lab
+
