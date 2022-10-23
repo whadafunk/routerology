@@ -40,14 +40,14 @@
 ### Examples of RBL zones, and how you can configure them
 
 
-reject_rbl_client dnsbl.sorbs.net,
-reject_rbl_client zen.spamhaus.org
-reject_rbl_client zen.spamhaus.org=127.0.0.[2..11]
-reject_rhsbl_client dbl.spamhaus.org
-reject_rhsbl_reverse_client dbl.spamhaus.org
-reject_rbl_client b.barracudacentral.org=127.0.0.2
-reject_rbl_client bl.spamcop.net
-reject_rbl_client rbl.abuse.ro=127.0.0.[2..3],
-reject_rbl_client rbl.abuse.ro,
-reject_rbl_client pbl.abuse.ro,
-reject_rhsbl_sender dbl.abuse.ro
+- reject_rbl_client dnsbl.sorbs.net,
+- reject_rbl_client zen.spamhaus.org
+- reject_rbl_client zen.spamhaus.org=127.0.0.[2..11]
+- reject_rhsbl_client dbl.spamhaus.org
+- reject_rhsbl_reverse_client dbl.spamhaus.org
+- reject_rbl_client b.barracudacentral.org=127.0.0.2
+- reject_rbl_client bl.spamcop.net
+- reject_rbl_client rbl.abuse.ro=127.0.0.[2..3],
+- reject_rbl_client rbl.abuse.ro,
+- reject_rbl_client pbl.abuse.ro,
+- reject_rhsbl_sender dbl.abuse.ro
