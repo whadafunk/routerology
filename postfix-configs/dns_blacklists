@@ -1,6 +1,6 @@
 # DNS BlackList Mechanism for SMTP
 
-> The DNS blacklist is basicaly a DNS domain where each record can identify a specific client IP or Hostname
+>The DNS blacklist is basicaly a DNS domain where each record can identify a specific client IP or Hostname
 
 - RBL (real time blacklist) -> this type of blacklist stores client ips
 - RHSBL (Right Hand Side BlackList) -> this type of blacklist stores hostnames and domain names
@@ -10,10 +10,10 @@
 
 ### Content of the blacklist zones
 
-> A blacklist zone adds the client ips in reverse notation as a prefix to the zone name.
-> For example, if we host the black list zone **myblacklist.local**, the records will look like this:
-> -  82.15.234.193.myblacklist.local	INET	A	127.0.0.2
-> -  41.203.1.10.myblacklist.local	INET	A	127.0.0.3
+>A blacklist zone adds the client ips in reverse notation as a prefix to the zone name.
+>For example, if we host the black list zone **myblacklist.local**, the records will look like this:
+>-  82.15.234.193.myblacklist.local	INET	A	127.0.0.2
+>-  41.203.1.10.myblacklist.local	INET	A	127.0.0.3
 
 > What you need to observe here, is that the A record can return different IP addresses. With some of the  
 > SMTP servers, you can check also the returned IP, and make a decision based on that, but most of the time   
