@@ -1,0 +1,49 @@
+# http://www.postfix.org/ldap_table.5.html
+# LDAP lookup tables can be used for lists like :
+# $mynetworks, $mydestination, $relay_domains, $local_recipient_maps, $relay_recipient_maps
+# It is important to note that these tables must store each list member as a separate key
+
+server_host = ldap://192.168.100.101 ldaps://192.168.100.102
+server_port = 389
+# server_port = 636
+ldap_version = 3
+timeout = 5
+serch_base = dc=my,dc=domain,dc=ro
+scope = sub
+query_filter = (|(mail=%u@*)(mail_domain=*@%d))
+result_attribute = mail
+result_format = %u
+bind = yes
+bind_dn = cn=ldap_read,cn=users,dc=my,dc=domain,dc=com
+bind_pw = passw0rd
+
+# domain (default: no domain list) -> when specified only fully qualified search keys are eligible
+# When one or more  special  result  attributes  are  found  in  a
+# non-terminal  (see above) LDAP entry, leaf result attributes are
+# excluded from the expansion of that entry. 
+# special_result_attribute (default: empty)
+# leaf_result_attribute (default: empty)
+
+
+# TLS Settings
+
+# server_host = ldaps://ldap.example.com:636
+# start_tls = yes
+# version 3 ldap is required for ldaps
+# version = 3
+# tls_ca_cert_dir = 
+# tls_ca_cert_file =
+# tls_cert (No default; you must set this)
+# tls_key (No default; you must set this)
+# tls_require_cert (default: no)
+
+
+# % EXPANSIONS
+# These expansions can be used for search_base, query_filter and result_format parameters
+
+# %s - input key
+# %u - user part of the input key (left hand side value)
+# %d - domain part of the input key
+# %[SUD] - upper-case equivalents of the above expansions
+# %[1-9] - Ex: for user@mail.example.com -> %1 is com, %2 is example, %3 is mail
+

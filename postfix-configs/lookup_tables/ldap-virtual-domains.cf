@@ -1,0 +1,6 @@
+server_host = ldap://ldap.example.net/
+search_base = ou=Domains,dc=example,dc=net
+version = 3
+bind = no
+query_filter = (&(ObjectClass=dNSDomain)(dc=%s))
+result_attribute = dc

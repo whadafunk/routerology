@@ -1,0 +1,357 @@
+####################################    SYSTEM CONFIGURATION     ###################################
+
+compatibility_level = 2
+
+# command_directory=/usr/sbin
+
+daemon_directory=/usr/lib/postfix/sbin
+data_directory=/var/lib/postfix
+config_directory=/etc/postfix
+default_database_type = hash
+
+mail_name = PostfixSrv
+# mail_version = 3.5.X
+smtpd_banner = $myhostname ESMTP $mail_name (Custom/GNU)
+
+mydomain = packets.lab
+myhostname = mx.packets.lab
+myorigin = $myhostname
+smtp_helo_name = $myhostname
+
+mynetworks_style = subnet
+mynetworks = 192.168.1.0/24
+
+inet_interfaces = all
+# proxy_interfaces =
+# smtp_bind_address =
+# lmtp_bind_address =
+
+inet_protocols = ipv4
+
+smtpd_peername_lookup = yes
+
+mail_owner = postfix
+setgid_group = postdrop
+default_privs = nobody
+
+
+################             LOGGING              ###############
+
+
+syslog_facility = mail
+syslog_name = ${multi_instance_name?{$multi_instance_name}:{postfix}}
+# WHEN MAILLOG_FILE IS NOT EMPTY, THE SYSLOG WILL STOP
+# maillog_file = /var/log/postfix/postfix.log
+# maillog_file_prefixes = /var, /dev/stdout
+# maillog_file_rotate_suffix = %Y%m%d-%H%M%S
+# maillog_file_compressor = gzip
+# SERVICE NAME IS USED ESPECIALLY IN MASTER.CF WITH SYSLOG_NAME, TO DISTINGUISH SPECIFIC DAEMON LOGGING
+# EX -O SYSLOG_NAME=POSTFIX/$SERVICE_NAME
+# service_name (read-only)
+
+#################           DEBUGGING           ###################
+# debug_peer_level = 2
+# debug_peer_list = 192.168.1.1, 192.168.1.2
+
+
+################   SMTP CLIENT SASL AUTHENTICATION  ################
+
+smtp_sasl_auth_enable = no
+
+###############    SMTPD  SERVER SASL AUTHENTICATION   ##############
+
+smtpd_sasl_auth_enable = yes
+smtpd_sasl_type = cyrus
+broken_sasl_auth_clients = yes
+smtpd_sasl_mechanism_filter = !external, plain, login, digest-md5, cram-md5, static:rest
+smtpd_sasl_security_options = noanonymous, noactive, nodictionary
+smtpd_sasl_tls_security_options = $smtpd_sasl_security_options
+# THE PARAMETER SETTING "SMTPD_TLS_SECURITY_LEVEL = ENCRYPT" IMPLIES "SMTPD_TLS_AUTH_ONLY = YES".
+smtpd_tls_auth_only = no
+cyrus_sasl_config_path = /etc/postfix/sasl:/etc/sasl2:/usr/local/lib/sasl2
+smtpd_sasl_path = smtpd
+# THE SERVICE NAME THAT IS PASSED TO THE SASL PLUG-IN THAT IS SELECTED WITH SMTPD_SASL_TYPE AND SMTPD_SASL_PATH. 
+# THIS I THINK IS IMPORTANT WITH REGARD TO SELECTING THE PROPER PAM CONFIG FILE UNDER /ETC/PAM.D/
+smtpd_sasl_service = smtp
+smtpd_sasl_authenticated_header = yes
+smtpd_sasl_exception_networks =
+
+
+###########        SMTP/D TLS SUPPORT OPTIONS           ##########
+
+# tls_ssl_options (default: empty)
+#	-ENABLLE_MIDDLEBOX_COMPAT, LEGACY_SERVER_CONNECT, NO_TICKET
+#	NO_COMPRESSION, NO_RENEGOTIATION, NO_SESSION_RESUMPTION_ON_RENEGOTIATION,
+#	PRIORITIZE_CHACHA, 0x40000000
+tls_ssl_options = NO_COMPRESSION
+# PREVENT POSTFIX FROM APPENDING THE SYSTEM-SUPPLIED DEFAULT CAS AND TRUSTING THIRD-PARTY CERTIFICATES. 
+tls_append_default_CA = no
+
+
+###########         SMTPD (SERVER) TLS OPTIONS             #########
+
+smtpd_tls_wrappermode = no
+smtpd_tls_security_level =  may
+# smtpd_tls_CAfile = /etc/ssl/certs/ca-certificates.crt
+# smtpd_tls_CApath = /etc/postfix/pki/ca/
+# CREATE THE SERVER.PEM FILE WITH "CAT SERVER_CERT.PEM INTERMEDIATE_CA.PEM ROOT_CA.PEM > SERVER.PEM". 
+# smtpd_tls_cert_file = /etc/postfix/pki/server.pem
+# smtpd_tls_key_file = $smtpd_tls_cert_file
+# POSTFIX ≥ 3.4.  PREFERRED CONFIGURATION INTERFACE IS SMTPD_TLS_CHAIN_FILES.  EACH FILE SPECIFIED HAS THIS STRUCTURE:
+# smtpd_tls_chain_files =
+#   /etc/postfix/priv_key.pem,
+#    /etc/postfix/server_cert.pem,
+#    /etc/postfix/server_ca.pem,
+#    /etc/postfix/root_ca.pem
+
+smtpd_tls_ccert_verifydepth = 9
+smtpd_tls_ask_ccert = no
+smtpd_tls_req_ccert = no
+smtpd_tls_fingerprint_digest = sha256
+smtpd_tls_protocols = !SSLv2, !SSLv3, TLSv1, TLSv1.1, TLSv1.2, TLSv1.3
+smtpd_tls_mandatory_protocols = $smtpd_tls_protocols
+smtpd_tls_ciphers = medium 
+smtpd_tls_mandatory_ciphers = $smtpd_tls_ciphers
+smtpd_tls_exclude_ciphers = aNULL, MD5, DES, DES+MD5, AES256-SHA, DES-CB3-MD5
+smtpd_tls_mandatory_exclude_ciphers = $smtpd_tls_exclude_ciphers
+tls_preempt_cipherlist = no
+smtpd_tls_loglevel = 0
+smtpd_tls_received_header = no
+# smtpd_tls_session_cache_database = btree:/var/lib/postfix/tls_session_cache.db
+
+
+#########      LOCAL ADDRESS CLASS      #########
+
+mydestination = sandbox.lab
+local_recipient_maps = proxy:unix:passwd.byname $alias_maps
+# local_recipient_maps = hash:$config_directory/maps_recipient/local_recipient_maps
+alias_maps = hash:$config_directory/maps_alias/aliases
+alias_database = hash:$config_directory/maps_alias/aliases
+local_transport = local:$myhostname
+
+# mailbox_command =
+# mailbox_command_maps = hash:$config_directory/maps_transport/mailbox_command_maps
+
+# mailbox_transport = lmtp:remote.lab:24
+# mailbox_transport_maps = hash:$config_directory/maps_transport/mailbox_transport_maps
+
+# home_mailbox = mailbox_file | /Mailbox | /Maildir/
+# mail_spool_directory = /var/spool/mailbox | /var/spool/maildir/
+
+# fallback_transport = agent:host:port
+# fallback_transport_maps = hash:$config_directory/maps_transport/fallback_transport_maps
+
+# forward_path = $user/$home/$recipient/$domain
+# allow_mail_to_files = alias, forward, include
+# allow_mail_to_commands = alias, forward, include
+
+# luser_relay = john.doe@sandbox.lab | $user@$other.host | $local@$other.host
+
+########       VIRTUAL ALIAS CLASS        #######
+
+virtual_alias_maps = hash:$config_directory/maps_alias/virtual_alias_maps
+
+
+############          VIRTUAL RELAY CLASS        #########
+
+# relay_domains = relay.lab
+# relay_recipient_maps = hash:$config_directory/maps_recipient/relay_recipient_maps
+# YOU CAN SPECIFY RELAY TRANSPORT WITH NEXTHOP OR NOT. IF YOU 
+# DON'T SPECIFY A NEXT HOP, DNS QUERRY WILL BE USED TO FIND ONE
+# relay_transport = smtp:[gigi.com]
+
+#############           DEFAULT CLASS             ########
+
+default_transport = smtp
+# relayhost = domain.lab:25 | [mx.domain.lab]:25
+
+
+##############          TRANSPORTS              ##############
+
+# EXAMPLES OF TRANSPORT MAP ENTRIES:
+#  user@domain transport:nexthop
+#  domain transport:nexthop
+#  * transport:nexthop
+#  my.domain :             # USE THE TRANSPORT THAT MATCHES THE ADDRESS DOMAIN CLASS
+#  example.com :[gateway.example.com]  # DO NOT TRY AN MX LOOKUP ON SPECIFIED HOST
+# transport_maps = hash:$config_directory/maps_transport/default_transport_maps
+#
+######    CLEANUP PREQUEUE ACTIONS (CANONICAL REWRITE, MASQUERADE, BCC, HEADER/BODY CHECKS) ######
+
+# THE PROCESSING STAGES OF CLEANUP ARE: 
+# NORMALIZATION, CANONICAL REWRITE, DOMAIN MASQUERADE, VIRTUAL ALIASING, BCC, HEADER AND BODY CHECKS
+
+# cleanup_service_name = cleanup
+
+# THESE APPEND ACTIONS ARE PART OF THE NORMALIZATION PROCESS
+# append_at_myorigin = yes
+# append_dot_mydomain = yes
+
+# THE CANONICAL REWRITE ACTIONS ARE AFFECTING ONLY THE CLIENTS MENTIONED IN LOCAL_HEADER_REWRITE_CLIENTS
+# local_header_rewrite_clients = permit_inet_interfaces, permit_mynetworks, permit_sasl_authenticated, permit_tls_clientcerts, static:all
+# remote_header_rewrite_domain = invalid.domain
+
+# THE RECEIVE_OVERRIDE_OPTIONS IS MOST LIKELY TO BE USED IN MASTER.CF TO AFFECT THE BEHAVIOUR OF A FILTER DAEMON 
+# receive_override_options = no_unknown_recipient_checks, no_address_mappings, no_milters, no_header_body_checks
+
+
+# CANONICAL MAPS ALLOW FOR HEADER AND ENVELOPE REWRITE OF BOTH RECIPIENT AND SENDER
+# canonical_maps = hash:$config_directory/maps_canonical/canonical_maps
+# canonical_classes = envelope_sender, envelope_recipient, header_sender, header_recipient
+# YOU CAN GET SELECTIVE IF YOU WANT; CHANGE ONLY THE SENDER FOR EXAMPLE
+# recipient_canonical_maps = hash:$config_directory/maps_canonical/recipient_canonical_maps
+# recipient_canonical_classes = envelope_recipient, header_recipient
+# sender_canonical_maps = hash:$config_directory/maps_canonical/sender_canonical_maps
+# sender_canonical_classes = envelope_sender, header_sender
+# WITH THE FOLLOWING, THE ORIGINAL RECIPIENT ADDRESS IS STORED IN THE X-ORIGINAL-TO MESSAGE HEADER
+# enable_original_recipient (default: yes)
+
+# MASQUERADE IS LIKE LIMITED AUTOMATED REWRITING.
+# masquerade_classes = envelope_sender, header_sender, envelope_recipient, header_recipient
+# masquerade_domains = sandbox.lab, !nothisone.sandbox.lab
+# masquerade_exceptions = nothisone.sandbox.lab
+
+# THESE BCC FEATURES CAN BE EASILY USED FOR JOURNALIZATION
+# always_bcc =
+# recipient_bcc_maps = 
+# sender_bcc_maps =
+
+
+### BUILT IN CONTENT FILTER      ###
+
+body_checks =
+body_checks_size_limit = 51200
+header_checks =
+header_size_limit = 102400
+
+#########       SECURITY AND RELAY CONTROLS         ##########
+
+message_size_limit = 10240000
+smtpd_recipient_limit = 100
+smtpd_authorized_xclient_hosts =
+smtpd_authorized_xforward_hosts =
+# POSTQUEUE FILTERING
+# content_filter = 
+# PREQUEUE FILTERING (ALTERNATIVE TO MILTER)
+# smtpd_proxy_filter =
+# default_filter_nexthop = 
+
+smtpd_helo_required = yes
+strict_rfc821_envelopes = yes
+disable_vrfy_command = yes
+soft_bounce = no
+#relay_clientcerts = hash:$config_directory/maps_cert/relay_clientcerts
+
+smtpd_delay_reject = yes
+
+unknown_address_reject_code = 554
+unknown_hostname_reject_code = 554
+unknown_client_reject_code = 554
+
+# SPECIFY A LIST OF "PERMIT" ACTION NAMES, "/FILE/NAME" OR "TYPE:TABLE" PATTERNS, SEPARATED BY COMMAS AND/OR WHITESPACE. 
+smtpd_log_access_permit_actions = static:all, permit_dnswl_client
+
+# Enforcing the recipient maps even if the corresponding parameter from smtpd_recipient_restrictions is off
+smtpd_reject_unlisted_recipient = yes
+smtpd_reject_unlisted_sender = no
+
+# IN ADDITION TO THE RESTRICTIONS AND PERMIT ACTIONS SPECIFIC TO STAGES OF THE SMTP CONVERSTION
+# WE CAN ALSO USE THE FOLLOWING GENERIC ACTIONS:
+# permit, reject, defer, reject_unauth_pipelining, reject_plaintext_session,
+# defer_if_reject, defer_if_permit, warn_if_reject, check_policy_service
+
+###   SMTP CLIENT RESTRICTIONS   ###
+# Dont' forget about the access lookup values:
+# OK, REJECT, DUNNO, DEFER, DISCARD, FILTER, PREPEND, BCC, DEFER_IF_REJECT, DEFER_IF_PERMIT, 4NN, 5NN
+# Or the generic parameters which can be used directly:
+# reject, defer, defer_if_reject, defer_if_permit, check_policy_service, reject_unauth_pipelining, warn_if_reject
+
+smtpd_client_restrictions =  	
+	check_client_access hash:$config_directory/maps_access/client_access_maps, 
+	reject_unknown_reverse_client_hostname,
+#	permit_dnswl_client wl.packets.lab,
+#	permit_rhsbl_client wl.packets.lab,
+	reject_rbl_client zen.spamhaus.org,
+	reject_rhsbl_client dbl.spamhaus.org
+
+mua_client_restrictions = 
+	check_client_access hash:/$config_directory/maps_access/client_access_maps
+#--------------------------------------------------------------------------------------#
+
+# SMTP HELO RESTRICTIONS #
+smtpd_helo_restrictions = 
+	reject_invalid_helo_hostname,
+	reject_unknown_helo_hostname,
+	reject_non_fqdn_helo_hostname
+
+mua_helo_restrictions =
+#--------------------------------------------------------------------------------------#	
+
+# smtpd_sender_login_maps = hash:$config_directory/sasl/sender_login_maps
+
+#### SMTP SENDER RESTRICTIONS ####
+smtpd_sender_restrictions = 
+	reject_non_fqdn_sender,
+	reject_unknown_sender_domain
+
+mua_sender_restrictions = 
+	reject_plaintext_session
+#----------------------------------------------------------------------------------------#
+
+# SMTP RECIPIENT RESTRICTIONS #
+smtpd_recipient_restrictions =
+	reject_unknown_recipient_domain,
+	reject_non_fqdn_recipient,
+	permit_auth_destination,
+	reject_unauth_destination,
+	reject_unlisted_recipient
+
+mua_recipient_restrictions = 
+	reject_unknown_recipient_domain,
+	reject_non_fqdn_recipient,
+	permit_auth_destination
+	check_client_access hash:$config_directory/maps_access/client_access_maps,
+	permit_sasl_authenticated,
+	reject_unauth_destination
+#------------------------------------------------------------------------------------------------#
+
+# SMTP RELAY RESTRICTIONS #
+smtpd_relay_restrictions =
+	reject_unauth_pipelining
+
+smtpd_relay_restrictions = 
+
+#------------------------------------------------------------------------------------------------#
+
+# SMTP DATA RESTRICTIONS #
+smtpd_data_restrictions = 
+
+######  SMTP CLIENT FEATURES  ######
+# smtp_send_xforward_command = no
+# smtp_generic_maps =
+# smtp_body_checks =
+# smtp_header_checks = 
+
+######  NOTIFICATION CONFIGURATION ######
+
+# First we enable the notification classes we are interested in
+notify_classes = resource, software, bounce, 2bounce, protocol, delay, policy
+
+# Then we specify the address for each notification class
+
+# SEND POSTMASTER THE HEADERS OF BOUNCED MAIL, AND TRANSCRIPTS OF THE SMTP SESSION
+# bounce_notice_recipient = postmaster
+# IF THE UNDELIVERABLE NOTIFICATION CANNOT BE SENT TO THE ORIGINATOR, INFORM THE POSTMASTER
+# 2bounce_notice_recipient = postmaster
+# SEND TO POSTMASTER COPIES OF THE HEADER OF DELAYED MAIL (MAIL WAITING IN QUEUE FOR A SPECIFIC CONDITION TO END)
+# delay_notice_recipient = postmaster
+# NOTIFICATIONS ABOUT MAIL REJECTED FOR POLICY REASONS (UCE POLICY)
+# policy_notice_recipient = postmaster
+# CLIENT OR SERVER PROTOCOL ERRORS
+# THE LAST FOUR NOTIFICATION CLASSES (POLICY, PROTOCOL, RESOURCE AND SOFTWARE)
+# CAN BE REPLACED BY ERROR_NOTICE_RECIPIENT AS BELOw
+# error_notice_recipient = postmaster
+# protocol_notice_recipient = postmaster
+# resource_notice_recipient = postmaster
+# software_notice_recipient = postmaster
+# bounce_size_limit (default: 50000)

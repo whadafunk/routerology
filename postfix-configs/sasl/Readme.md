@@ -1,6 +1,30 @@
+# SASL Authentication Notes
 
+> SASL is a library that adds authentication mechanisms to processes like SMTP, IMAP, LMTP, POP3
+> For a specific authentication scheme the library needs to read some configuration parameters, and it can do that  
+> either from a dedicated config file, or the service itself can send configuration parameters to the library
+
+The smtp and smtpd services from postfix, for example are using dedicated sasl configuration files.
+The cyrus imap and pop3 services on the other hand, can call the library with the configuration parameters, from their own config files.
+
+### Configuring SASL for Postfix
 Apart from configuration inside main.cf, you also need to take care of the configuration file for the sasl library. 
-The way this works is that smtp/smtpd is sending a request to the sasl library with the name of the application/service needing authentication, and the library is using that name to construct a path/filename where to find the name of the configuration file for that particular application/service.
+The way this works is that smtp/smtpd is sending a request to the sasl library with the name of the application/service needing authentication,  
+and the library is using that name to construct a path/filename where to find the name of the configuration file  
+for that particular application/service.
+
+#### There are a couple of places where sasl looks for the service configuration file:
+- /etc/sasl2
+- /usr/local/lib/sasl2
+- /etc/postfix/sasl 
+
+If you don't kwnow where the sasl library is looking for a configuration file, there are a couple of ways to find that out
+
+- Use strace -p *master_process_id* -f to attach to the postfix master process and look for open -ENOENT messages from the SASL
+- Postfix provides a tool special for that, which is called *saslfinger* and it will show you a lot of useful information about the SASL configuration in Postfix
+
+
+
 
 Is this the config file where we specify mechanisms and methods for the SASL authentication:
 

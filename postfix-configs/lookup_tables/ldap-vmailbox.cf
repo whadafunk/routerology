@@ -1,0 +1,6 @@
+server_host = ldap://ldap.example.net/
+search_base = ou=Mail,dc=example,dc=net
+version = 3
+bind = no
+query_filter = (&(objectclass=inetOrgPerson)(mail=%s))
+result_attribute = mail

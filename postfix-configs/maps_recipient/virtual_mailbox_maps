@@ -1,0 +1,13 @@
+# The virtual(8) delivery agent uses this table to look up the per-recipient mailbox or maildir pathname. If the lookup result ends in a slash ("/"), maildir-style delivery is carried out, otherwise the path is assumed to specify a UNIX-style mailbox file. Note that $virtual_mailbox_base is unconditionally prepended to this path. 
+
+# EXAMPLES
+
+# mailbox format
+john.doe@gigi.com	/var/spool/mail/john.doe 
+
+# maildir format
+jane.doesit@gmail.com	/var/spool/mail/jane.doesit/
+
+# In a lookup table, specify a left-hand side of "@domain.tld" to match any user in the specified domain that does not have a specific "user@domain.tld" entry. 
+
+@mydomain.com	/var/spool/mail/all_from_domain/

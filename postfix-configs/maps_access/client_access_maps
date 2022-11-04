@@ -16,12 +16,24 @@
 # DNS hostname
 # IP address, full/partial/wildcard
 # Look at the following examples:
+#
+# Email Address Patterns
+#
+# user@domain
+# domain.tld
+# .domain.tld
+# user@
 # 
 # user@domain -> domain.ltd -> .domain.ltd ( the subdomain matching
 #	depends on the parent_domain_matches_subdomains )
 # user@ - matches all mail addresses with the specified user part
 # domain.ltd -> .domain.ltd 
+#
+# HostName / Address Patterns
+#
 # net.work.addr.ess -> net.work.addr -> net.work -> net
+# domain.tld -> matches domain
+# .domain.tld -> matches subdomains of domain.tld
 
 # The actions accepted on the RHS are the following:
 # OK 

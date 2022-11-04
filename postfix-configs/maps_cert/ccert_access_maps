@@ -1,3 +1,5 @@
+# This map is used by the smtp access restriction check_ccert_access
+
  To find the fingerprint of a specific certificate file, with a specific digest algorithm, run:
 
     $ openssl x509 -noout -fingerprint -digest -in certfile.pem

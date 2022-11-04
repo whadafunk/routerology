@@ -1,16 +1,22 @@
-#This file is processed by the cleanup daemon before queueing the message for delivery
-#For each entry match in this list, the envelope only of the message will be replaced with the corresponding key
-#The key, can be a multiple value; In this case the entry functions as an email alias group.
-#Addresses found in virtual alias maps are subjected to another iteration of virtual aliasing, 
-#but are not subjected to canonical mapping, in order to avoid loops. 
-#The matching is done in the following order:
+# This file is processed by the cleanup daemon before queueing the message for delivery
+# For each entry match in this list, the envelope only of the message will be replaced with the corresponding key
+# The key, can be a multiple value; In this case the entry functions as an email alias group.
+# Addresses found in virtual alias maps are subjected to another iteration of virtual aliasing, 
+# but are not subjected to canonical mapping, in order to avoid loops. 
+# The matching is done in the following order:
 # 1. Complete address user.name@domain.com
 # 2. Only the username part user.name
 # 3. Only the domain part @domain.com
-#For keys matching only the domain part, attention is required because all addresses in that particular domain
-#that do not have an virtual_alias match will be rewriten; it can be used for a spamtrap
+# For keys matching only the domain part, attention is required because all addresses in that particular domain
+# that do not have an virtual_alias match will be rewriten; it can be used for a spamtrap
+# With this form, the  Postfix  SMTP server accepts mail for any recipient in domain, 
+# regardless of whether that recipient exists.
 #
 john.doe@packets.lab	john.doe@gmail.com
-office@packets.lab	john.doe@gmail.com,daniel@gmail.com,nathaniel@gmail.com,other@yahoo.com
+office@packets.lab	john.doe@gmail.com, daniel@gmail.com, nathaniel@gmail.com, other@yahoo.com
 joehn.local		joehn@gmail.com
 @spamtrap.io		spamtrap@my_server.local
+
+
+# ATTENTION
+# When using a lookup key of format user.name without the @domain part, the domain of the recipient address in the envelope, needs to be one of the local hosted domains (mydestination, myorigin, inet_interfaces, proxy_interfaces)

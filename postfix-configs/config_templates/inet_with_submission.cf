@@ -1,6 +1,6 @@
-######                           POSTFIX MAIN CONFIGURATION TEMPLATE                          ######
-######    THIS IS THE BIG COMMENTED ALL OPTIONS MAIN CONFIGURATION TEMPLATE FOR POSTFIX       ######
-######    USE THIS MOSTLY AS A REFERRENCE TO SEE AND UNDERSTAND WHAT OPTIONS ARE AVAILABLE    ######
+######    THIS IS A BIT MORE ADVANCED CONFIGURATION TEMPLATE FOR POSTFIX                        ######
+######    IT WILL CONFIGURE TWO SMTPD DAEMONS: ONE GENERIC AND A SUBMISSION DEDICATED ONE       ######
+######    IT HAS SASL AUTHENTICATION, TLS AND LMTP DELIVERY TO CYRUS IMAP                       ######
 
 ####################################    SYSTEM CONFIGURATION     ###################################
 
@@ -25,7 +25,7 @@ smtp_helo_name = $myhostname
 mynetworks_style = subnet
 mynetworks = 192.168.1.0/24
 
-# inet_interfaces = all | loopback-only | 192.168.1.1
+inet_interfaces = all
 # proxy_interfaces =
 # smtp_bind_address =
 # lmtp_bind_address =
@@ -33,7 +33,6 @@ mynetworks = 192.168.1.0/24
 inet_protocols = ipv4
 
 smtpd_peername_lookup = yes
-
 
 mail_owner = postfix
 setgid_group = postdrop
@@ -62,47 +61,23 @@ syslog_name = ${multi_instance_name?{$multi_instance_name}:{postfix}}
 ################   SMTP CLIENT SASL AUTHENTICATION  ################
 
 smtp_sasl_auth_enable = no
-smtp_sasl_type = cyrus
-
-# A HELPER FOR THE SASL LIBRARY TO FIND THE CONFIG FILE
-# smtp_sasl_path =
-
-# POSTFIX SMTP CLIENT LOOKUP TABLES WITH ONE USERNAME:PASSWORD ENTRY PER SENDER, REMOTE HOSTNAME OR NEXT-HOP DOMAIN. 
-# smtp_sasl_password_maps = btree:sasl/smtp_sasl_password_maps
-
-# PREVENT REPEATED sasl AUTHENTICATION FAILURES WITH THE SAME REMOTE smtp SERVER HOSTNAME, USERNAME AND PASSWORD.
-# smtp_sasl_auth_cache_name = btree:/var/lib/postfix/smtp_sasl_auth_cache
-
-# FROM THE LIST OF SUPPORTED MECHANISM FROM SERVER AND CLIENT, RESTRICT EVEN MORE TO THE ONES HERE
-# smtp_sasl_mechanism_filter = plain, login, digest-md5, cram-md5, !gssapi
-
-# YOU CAN ALSO RESTRICT MECHANISMS GENERICALLY BY SPECIFYING CATEGORIES, LIKE BELOW
-# smtp_sasl_security_options = noplaintext,noanonymous,noactive,nodictionary
-# smtp_sasl_tls_security_options = $smtp_sasl_security_options
-
 
 ###############    SMTPD  SERVER SASL AUTHENTICATION   ##############
 
-smtpd_sasl_auth_enable = no
+smtpd_sasl_auth_enable = yes
 smtpd_sasl_type = cyrus
 broken_sasl_auth_clients = yes
-
-# RESTRICT THE LIST OF MECHANISMS OFFERED BY SMTPD
-smtpd_sasl_mechanism_filter = !external, plain, login, digest-md5, cram-md5
-smtpd_sasl_security_options = noanonymous
+smtpd_sasl_mechanism_filter = !external, plain, login, digest-md5, cram-md5, static:rest
+smtpd_sasl_security_options = noanonymous, noactive, nodictionary
 smtpd_sasl_tls_security_options = $smtpd_sasl_security_options
 # THE PARAMETER SETTING "SMTPD_TLS_SECURITY_LEVEL = ENCRYPT" IMPLIES "SMTPD_TLS_AUTH_ONLY = YES".
 smtpd_tls_auth_only = no
-# smtpd_sasl_local_domain =
-# SPECIFY ZERO OR MORE DIRECTORIES SEPARATED BY A COLON CHARACTER, OR AN EMPTY VALUE TO USE CYRUS SASL'S BUILT-IN SEARCH PATH. 
-cyrus_sasl_config_path = $config_dir/sasl:/etc/sasl2:/usr/local/lib/sasl2
+cyrus_sasl_config_path = /etc/postfix/sasl:/etc/sasl2:/usr/local/lib/sasl2
 smtpd_sasl_path = smtpd
 # THE SERVICE NAME THAT IS PASSED TO THE SASL PLUG-IN THAT IS SELECTED WITH SMTPD_SASL_TYPE AND SMTPD_SASL_PATH. 
 # THIS I THINK IS IMPORTANT WITH REGARD TO SELECTING THE PROPER PAM CONFIG FILE UNDER /ETC/PAM.D/
 smtpd_sasl_service = smtp
-# REPORT THE SASL AUTHENTICATED USER NAME IN THE SMTPD RECEIVED MESSAGE HEADER. 
 smtpd_sasl_authenticated_header = yes
-# DO NOT OFFER AUTH SUPPORT TO THE SPECIFIED NETWORKS BELLOW
 smtpd_sasl_exception_networks =
 
 
@@ -120,96 +95,33 @@ tls_append_default_CA = no
 ###########         SMTPD (SERVER) TLS OPTIONS             #########
 
 smtpd_tls_wrappermode = no
-smtpd_tls_security_level = may
-smtpd_tls_CAfile = /etc/ssl/certs/ca-certificates.crt
-smtpd_tls_CApath = /etc/ssl/certs
-# CREATE THE SERVER.PEM FILE WITH "CAT SERVER_KEY.PEM SERVER_CERT.PEM INTERMEDIATE_CA.PEM ROOT_CA.PEM > SERVER.PEM". 
+smtpd_tls_security_level =  may
+# smtpd_tls_CAfile = /etc/ssl/certs/ca-certificates.crt
+# smtpd_tls_CApath = /etc/postfix/pki/ca/
+# CREATE THE SERVER.PEM FILE WITH "CAT SERVER_CERT.PEM INTERMEDIATE_CA.PEM ROOT_CA.PEM > SERVER.PEM". 
 # smtpd_tls_cert_file = /etc/postfix/pki/server.pem
 # smtpd_tls_key_file = $smtpd_tls_cert_file
-smtpd_tls_chain_files =
-   /etc/postfix/priv_key.pem,
-   /etc/postfix/server_cert.pem,
-   /etc/postfix/server_ca.pem,
-   /etc/postfix/root_ca.pem
+# POSTFIX ≥ 3.4.  PREFERRED CONFIGURATION INTERFACE IS SMTPD_TLS_CHAIN_FILES.  EACH FILE SPECIFIED HAS THIS STRUCTURE:
+# smtpd_tls_chain_files =
+#   /etc/postfix/priv_key.pem,
+#    /etc/postfix/server_cert.pem,
+#    /etc/postfix/server_ca.pem,
+#    /etc/postfix/root_ca.pem
 
 smtpd_tls_ccert_verifydepth = 9
-smtpd_tls_ask_ccert = yes
-# WORKS WITH **MANDATORY TLS ENCRYPTION ONLY**, REQUIRE A **TRUSTED** REMOTE SMTP CLIENT CERTIFICATE IN ORDER 
-# TO ALLOW TLS CONNECTIONS TO PROCEED. THIS OPTION IMPLIES "SMTPD_TLS_ASK_CCERT = YES". 
-# WITH OPPORTUNISTIC ENCRYPTION THE PARAMETER IS IGNORED
-# smtpd_tls_req_ccert = no
+smtpd_tls_ask_ccert = no
+smtpd_tls_req_ccert = no
 smtpd_tls_fingerprint_digest = sha256
-# ***************
-# COMMANDS EXAMPLE
-# openssl x509 -noout -fingerprint -sha256 -in cert.pem
-# openssl x509 -in cert.pem -noout -pubkey | openssl pkey -pubin -outform DER | openssl dgst -sha256 -v
-# ***************
 smtpd_tls_protocols = !SSLv2, !SSLv3, TLSv1, TLSv1.1, TLSv1.2, TLSv1.3
 smtpd_tls_mandatory_protocols = $smtpd_tls_protocols
-smtpd_tls_ciphers = medium
+smtpd_tls_ciphers = medium 
 smtpd_tls_mandatory_ciphers = $smtpd_tls_ciphers
 smtpd_tls_exclude_ciphers = aNULL, MD5, DES, DES+MD5, AES256-SHA, DES-CB3-MD5
 smtpd_tls_mandatory_exclude_ciphers = $smtpd_tls_exclude_ciphers
-# BY DEFAULT, THE OPENSSL SERVER SELECTS THE CLIENT'S MOST PREFERRED CIPHER THAT THE SERVER SUPPORTS.
-# SETTING "TLS_PREEMPT_CIPHERLIST = YES" ENABLES SERVER CIPHER PREFERENCES.
-# tls_preempt_cipherlist = no
-# LOGLEVEL CAN BE FROM 0 TO 4; 0 - DISABLE; 1 - SUMMARY; 2 - ALSO LOG LEVELS; 3 - DUMP TLS NEGOTIATION PROCESS
-# smtpd_tls_loglevel = 0
-# INCLUDE TLS NEGOTIATED INFORMATION IN THE RECEIVED: HEADER
-# smtpd_tls_received_header = no
-# FOR POSTFIX ≥ 2.11 THIS PARAMETER SHOULD GENERALLY BE LEFT EMPTY. 
+tls_preempt_cipherlist = no
+smtpd_tls_loglevel = 0
+smtpd_tls_received_header = no
 # smtpd_tls_session_cache_database = btree:/var/lib/postfix/tls_session_cache.db
-
-
-###########         SMTP CLIENT TLS OPTIONS        ############
-
-# DO NOT CONFIGURE CLIENT CERTIFICATES UNLESS YOU MUST PRESENT CLIENT TLS CERTIFICATES TO ONE OR MORE SERVERS. 
-# CLIENT CERTIFICATES ARE NOT USUALLY NEEDED, AND CAN CAUSE PROBLEMS IN CONFIGURATIONS THAT WORK WELL WITHOUT THEM. 
-# THE RECOMMENDED SETTING IS TO LET THE DEFAULTS STAND
-# smtp_use_tls = no *** Legacy opportunistic TLS option
-# smtp_enforce_tls = no ***Legacy options; You should use smtp_tls_security_level instead
-# smtp_tls_security_level = none | may | encrypt | dane | dane-only | fingerprint | verify | secure
-# smtp_tls_wrappermode = no ***enabling this also implies smtp_tls_security_level = encrypt
-# REQUIRE THAT THE REMOTE SMTP SERVER HOSTNAME MATCHES THE INFORMATION IN THE REMOTE SMTP SERVER CERTIFICATE
-# smtp_tls_enforce_peername = yes
-# THE TRUSTED SIGNING CA'S WHEN AUTHENTICATING THE SERVER CERTIFICATE
-# smtp_tls_CAfile = /etc/postfix/pki/ca.cer
-# smtp_tls_CApath = /etc/postfix/pki/ca/
-# TO ENABLE REMOTE SMTP SERVERS TO VERIFY THE POSTFIX SMTP CLIENT CERTIFICATE, 
-# THE ISSUING CA CERTIFICATES MUST BE MADE AVAILABLE TO THE SERVER. 
-# YOU SHOULD INCLUDE THE REQUIRED CERTIFICATES IN THE CLIENT CERTIFICATE FILE, 
-# CAT CLIENT_KEY.PEM CLIENT_CERT.PEM INTERMEDIATE_CA.PEM > CHAIN.PEM
-# THIS FILE MAY ALSO CONTAIN THE POSTFIX SMTP CLIENT PRIVATE RSA KEY, 
-# AND THESE MAY BE THE SAME AS THE POSTFIX SMTP SERVER RSA CERTIFICATE AND KEY FILE.
-# KEY1, CERT1, [CHAIN1], KEY2, CERT2, [CHAIN2], ..., KEYN, CERTN, [CHAINN].
-# smtp_tls_cert_file = /etc/postfix/pki/client_certs.pem
-# smtp_tls_key_file = $smtp_tls_cert_file
-# smtp_tls_chain_files = /etc/postfix/pki/packets.lab.pem
-# smtp_tls_protocols = !SSLv2, !SSLv3, TLSv1, <=TLSv1.3
-# smtp_tls_mandatory_protocols = $smtp_tls_mandatory_protocols
-# smtp_tls_cipherlist = ***obsolete
-# smtp_tls_ciphers = medium | export | low | high | null
-# smtp_tls_mandatory_ciphers = medium
-# smtp_tls_exclude_ciphers =
-# EXAMPLE OF SMTP_TLS_EXCLUDE CIPHERS ->> aNULL,MD5,DES,DES+MD5,AES256-SHA,DES-CBC3-MD5,kEDH+aRSA
-# smtp_tls_mandatory_exclude_ciphers = $smtp_tls_exclude_ciphers
-# TRY TO MAKE MULTIPLE DELIVERIES PER TLS-ENCRYPTED CONNECTION.
-# smtp_tls_connection_reuse = no
-# smtp_tls_fingerprint_digest = md5 | sha1 | sha256
-# LIST OF ACCEPTABLE REMOTE SMTP SERVER CERTIFICATE FINGERPRINTS OR PUBLIC KEY FINGERPRINTS
-# FOR THE "FINGERPRINT" TLS SECURITY LEVEL (SMTP_TLS_SECURITY_LEVEL = FINGERPRINT)
-# openssl x509 -noout -fingerprint -sha256 -in cert.pem
-# openssl x509 -in cert.pem -noout -pubkey | openssl pkey -pubin -outform DER | openssl dgst -sha256 -v
-#  AT THIS SECURITY LEVEL, CERTIFICATION AUTHORITIES ARE NOT USED, AND CERTIFICATE EXPIRATION TIMES ARE IGNORED. 
-# smtp_tls_fingerprint_cert_match =
-#  cd:fc:d8:db:f8:c4:82:96:6c:...:28:71:e8:f5:8d:a5:0d:9b:d4:a6
-#  dd:5c:ef:f5:c3:bc:64:25:36:...:99:36:06:ce:40:ef:de:2e:ad:a4
-# smtp_tls_loglevel = 0
-# LOG THE HOSTNAME OF A REMOTE SMTP SERVER THAT OFFERS STARTTLS, WHEN TLS IS NOT ALREADY ENABLED FOR THAT SERVER.
-# smtp_tls_note_starttls_offer = no
-# OPTIONAL LOOKUP TABLES WITH THE POSTFIX SMTP CLIENT TLS SECURITY POLICY BY NEXT-HOP DESTINATION;
-# smtp_tls_policy_maps =
-# smtp_tls_session_cache_database = btree:/var/lib/postfix/smtp_cache
 
 
 #########      LOCAL ADDRESS CLASS      #########
@@ -221,32 +133,23 @@ alias_maps = hash:$config_directory/maps_alias/aliases
 alias_database = hash:$config_directory/maps_alias/aliases
 local_transport = local:$myhostname
 
+# mailbox_command =
+# mailbox_command_maps = hash:$config_directory/maps_transport/mailbox_command_maps
 
+# mailbox_transport = lmtp:remote.lab:24
 # mailbox_transport_maps = hash:$config_directory/maps_transport/mailbox_transport_maps
-mailbox_transport = lmtp:remote.lab:24
-#
+
 # home_mailbox = mailbox_file | /Mailbox | /Maildir/
 # mail_spool_directory = /var/spool/mailbox | /var/spool/maildir/
 
-# fallback_transport_maps = hash:$config_directory/maps_transport/fallback_transport_maps
 # fallback_transport = agent:host:port
+# fallback_transport_maps = hash:$config_directory/maps_transport/fallback_transport_maps
 
-
-# WHERE THE LOCAL AGENT SHOULD FIND .FORWARD FILES; SUPPORTS NAMES EXPANSION
 # forward_path = $user/$home/$recipient/$domain
 # allow_mail_to_files = alias, forward, include
 # allow_mail_to_commands = alias, forward, include
 
-# THE LUSER_RELAY IMPLEMENTS SORT OF A CATCH_ALL FUNCTIONALITY FOR THE LOCAL ADDRESS CLASS
-# IN ALIAS_MAPS WE CANNOT HAVE A LOOKUPKEY WITH @, SO WE USE LUSER_RELAY INSTEAD
-# VARIABLES AVAILABLE FOR LUSER_RELAY: $domain,$extension,$home,$recipient,$recipient_delimiter,$shell,$user,${name?value},${name:value}
-# WE CAN USE THIS FEATURE FOR SMARTHOST
 # luser_relay = john.doe@sandbox.lab | $user@$other.host | $local@$other.host
-
-# THE PRECEDENCE OF LOCAL DELIVERY FEATURES FROM HIGH TO LOW IS:
-# ALIASES, .FORWARD, MAILBOX_TRANSPORT_MAPS, MAILBOX_TRANSPORT, MAILBOX_COMMAND_MAPS, MAILBOX_COMMAND,
-# HOME_MAILBOX, MAIL_SPOOL_DIRECTORY, FALLBACK_TRANSPORT_MAPS, FALLBACK_TRANSPORT
-
 
 ########       VIRTUAL ALIAS CLASS        #######
 
@@ -269,15 +172,6 @@ default_transport = smtp
 
 ##############          TRANSPORTS              ##############
 
-# THE SYNTAX FOR SPECIFYING A TRANSPORT IS: TRANSPORT = AGENT[:NEXTHOP]
-# EX FOR INET NEXTHOP
-# default_transport = smtp:[mailgw.local]:25
-# default_transport = lmtp:unix:/path/to/socket
-# THE NEXT HOP SYNTAX DEPENDS ON THE SPECIFIC TRANSPORT (SMTP/LMTP/VIRTUAL/ETC)
-# THE POSTFIX SMTP+LMTP CLIENT SUPPORTS MULTIPLE  DESTINATIONS  SEPARATED BY COMMA OR WHITESPACE
-# xxx_transport = smtp:[mail.gw1]:25, [mail.gw2]:25 *** IM NOT SHURE ABOUT THIS SYNTAC
-# MAPPING FROM EMAIL ADDRESSES TO MESSAGE DELIVERY  TRANSPORTS  AND  NEXT-HOP  DESTINATIONS.
-# THIS  MAPPING OVERRIDES THE DEFAULT TRANSPORT:NEXTHOP SELECTION THAT IS BUILT INTO POSTFIX
 # EXAMPLES OF TRANSPORT MAP ENTRIES:
 #  user@domain transport:nexthop
 #  domain transport:nexthop
@@ -291,10 +185,11 @@ default_transport = smtp
 # THE PROCESSING STAGES OF CLEANUP ARE: 
 # NORMALIZATION, CANONICAL REWRITE, DOMAIN MASQUERADE, VIRTUAL ALIASING, BCC, HEADER AND BODY CHECKS
 
-cleanup_service_name = cleanup
+# cleanup_service_name = cleanup
 
-append_at_myorigin = yes
-append_dot_mydomain = yes
+# THESE APPEND ACTIONS ARE PART OF THE NORMALIZATION PROCESS
+# append_at_myorigin = yes
+# append_dot_mydomain = yes
 
 # THE CANONICAL REWRITE ACTIONS ARE AFFECTING ONLY THE CLIENTS MENTIONED IN LOCAL_HEADER_REWRITE_CLIENTS
 # local_header_rewrite_clients = permit_inet_interfaces, permit_mynetworks, permit_sasl_authenticated, permit_tls_clientcerts, static:all
@@ -304,15 +199,18 @@ append_dot_mydomain = yes
 # receive_override_options = no_unknown_recipient_checks, no_address_mappings, no_milters, no_header_body_checks
 
 
+# CANONICAL MAPS ALLOW FOR HEADER AND ENVELOPE REWRITE OF BOTH RECIPIENT AND SENDER
 # canonical_maps = hash:$config_directory/maps_canonical/canonical_maps
 # canonical_classes = envelope_sender, envelope_recipient, header_sender, header_recipient
+# YOU CAN GET SELECTIVE IF YOU WANT; CHANGE ONLY THE SENDER FOR EXAMPLE
 # recipient_canonical_maps = hash:$config_directory/maps_canonical/recipient_canonical_maps
 # recipient_canonical_classes = envelope_recipient, header_recipient
 # sender_canonical_maps = hash:$config_directory/maps_canonical/sender_canonical_maps
 # sender_canonical_classes = envelope_sender, header_sender
 # WITH THE FOLLOWING, THE ORIGINAL RECIPIENT ADDRESS IS STORED IN THE X-ORIGINAL-TO MESSAGE HEADER
-# enable_original_recipient = yes
+# enable_original_recipient (default: yes)
 
+# MASQUERADE IS LIKE LIMITED AUTOMATED REWRITING.
 # masquerade_classes = envelope_sender, header_sender, envelope_recipient, header_recipient
 # masquerade_domains = sandbox.lab, !nothisone.sandbox.lab
 # masquerade_exceptions = nothisone.sandbox.lab
@@ -325,10 +223,10 @@ append_dot_mydomain = yes
 
 ### BUILT IN CONTENT FILTER      ###
 
-# body_checks (default: empty)
-# body_checks_size_limit (default: 51200)
-# header_checks (default: empty)
-# header_size_limit (default: 102400)
+body_checks =
+body_checks_size_limit = 51200
+header_checks =
+header_size_limit = 102400
 
 #########       SECURITY AND RELAY CONTROLS         ##########
 
@@ -337,16 +235,16 @@ smtpd_recipient_limit = 100
 smtpd_authorized_xclient_hosts =
 smtpd_authorized_xforward_hosts =
 # POSTQUEUE FILTERING
-content_filter = 
+# content_filter = 
 # PREQUEUE FILTERING (ALTERNATIVE TO MILTER)
-smtpd_proxy_filter =
+# smtpd_proxy_filter =
 # default_filter_nexthop = 
 
 smtpd_helo_required = yes
 strict_rfc821_envelopes = yes
 disable_vrfy_command = yes
 soft_bounce = no
-# relay_clientcerts = hash:$config_directory/maps_cert/relay_clientcerts
+#relay_clientcerts = hash:$config_directory/maps_cert/relay_clientcerts
 
 smtpd_delay_reject = yes
 
@@ -367,70 +265,70 @@ smtpd_reject_unlisted_sender = no
 # defer_if_reject, defer_if_permit, warn_if_reject, check_policy_service
 
 ###   SMTP CLIENT RESTRICTIONS   ###
+# Dont' forget about the access lookup values:
+# OK, REJECT, DUNNO, DEFER, DISCARD, FILTER, PREPEND, BCC, DEFER_IF_REJECT, DEFER_IF_PERMIT, 4NN, 5NN
+# Or the generic parameters which can be used directly:
+# reject, defer, defer_if_reject, defer_if_permit, check_policy_service, reject_unauth_pipelining, warn_if_reject
 
-smtpd_client_restrictions =
-        check_client_access hash:$config_directory/maps/client_access_maps,
-        reject_unknown_reverse_client_hostname,
-#       permit_dnswl_client,
-#       permit_rhsbl_client,
-        reject_rbl_client zen.spamhaus.org,
-        reject_rhsbl_client dbl.spamhaus.org
+smtpd_client_restrictions =  	
+	check_client_access hash:$config_directory/maps_access/client_access_maps, 
+	reject_unknown_reverse_client_hostname,
+#	permit_dnswl_client wl.packets.lab,
+#	permit_rhsbl_client wl.packets.lab,
+	reject_rbl_client zen.spamhaus.org,
+	reject_rhsbl_client dbl.spamhaus.org
 
-mua_client_restrictions =
-        check_client_access hash:$config_directory/maps/client_access_maps
-
+mua_client_restrictions = 
+	check_client_access hash:/$config_directory/maps_access/client_access_maps
 #--------------------------------------------------------------------------------------#
 
 # SMTP HELO RESTRICTIONS #
-smtpd_helo_restrictions =
-       reject_invalid_helo_hostname,
-       reject_unknown_helo_hostname,
-       reject_non_fqdn_helo_hostname
+smtpd_helo_restrictions = 
+	reject_invalid_helo_hostname,
+	reject_unknown_helo_hostname,
+	reject_non_fqdn_helo_hostname
 
 mua_helo_restrictions =
-#--------------------------------------------------------------------------------------#
+#--------------------------------------------------------------------------------------#	
 
+# smtpd_sender_login_maps = hash:$config_directory/sasl/sender_login_maps
 
-# SMTP SENDER RESTRICTIONS #
-smtpd_sender_restrictions =
-        reject_non_fqdn_sender,
-        reject_unknown_sender_domain
+#### SMTP SENDER RESTRICTIONS ####
+smtpd_sender_restrictions = 
+	reject_non_fqdn_sender,
+	reject_unknown_sender_domain
 
-mua_sender_restrictions =
-        reject_plaintext_session
-
+mua_sender_restrictions = 
+	reject_plaintext_session
 #----------------------------------------------------------------------------------------#
 
 # SMTP RECIPIENT RESTRICTIONS #
 smtpd_recipient_restrictions =
-       reject_unknown_recipient_domain,
-       reject_non_fqdn_recipient,
-       permit_auth_destination,
-       reject_unauth_destination,
-       reject_unlisted_recipient
+	reject_unknown_recipient_domain,
+	reject_non_fqdn_recipient,
+	permit_auth_destination,
+	reject_unauth_destination,
+	reject_unlisted_recipient
 
-mua_recipient_restrictions =
-        check_client_access hash:$config_directory/maps/client_access_maps,
-        reject_unknown_recipient_domain,
-        reject_non_fqdn_recipient,
-        permit_auth_destination,
-        permit_sasl_authenticated,
-        reject_unauth_destination
-
+mua_recipient_restrictions = 
+	reject_unknown_recipient_domain,
+	reject_non_fqdn_recipient,
+	permit_auth_destination
+	check_client_access hash:$config_directory/maps_access/client_access_maps,
+	permit_sasl_authenticated,
+	reject_unauth_destination
 #------------------------------------------------------------------------------------------------#
 
 # SMTP RELAY RESTRICTIONS #
 smtpd_relay_restrictions =
-        reject_unauth_pipelining
+	reject_unauth_pipelining
 
-mua_relay_restrictions =
+smtpd_relay_restrictions = 
 
 #------------------------------------------------------------------------------------------------#
 
 # SMTP DATA RESTRICTIONS #
-smtpd_data_restrictions =
-
-
+smtpd_data_restrictions = 
 
 ######  SMTP CLIENT FEATURES  ######
 # smtp_send_xforward_command = no
