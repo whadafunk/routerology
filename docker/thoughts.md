@@ -31,7 +31,7 @@ and assign GRANT ALL to the created user on the created database
 
 # Runtime container params
 
-Some of the commands of the docker file are used when starting the container, and they do not produce changes in the storage layer at build time.
+Some of the commands of the docker file are used at the container runtime, and they do not produce changes in the storage layer at build time.
 These commands are: 
 
 - Environment variables
@@ -42,5 +42,13 @@ These commands are:
 
 # User and Group IDs
 
+- The credentials of the running process can be specified with option user or with the USER parameter in Dockerfile
+- By default if no user is specified docker runs as root
+- Docker only cares about user ID, and not about user name associated with that ID (the name in the container can differ 
+	from the one in the host)
+- If you are not runing containers as root there might be access issues inside the container; you are a limited user
+- There is a feature that maps the root in the container to a normal user in the host
+- There is another way which you can run a process inside the container as non-root. And that is by the way of su
+- Regarding the last option it can be controlled in an init script with env variables
 
 # By 
