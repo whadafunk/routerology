@@ -1,0 +1,198 @@
+SIEVE SCRIPTING LANGUAGE
+
+In cyrus-imap, the sieve filtering is provided by the timesieved daemon, which has two features:
+
+	-provides a way for users to upload their sieve scripts on the server
+	-processes the sieve scripts when new mail arrives
+
+
+BASIC SYNTAX:
+
+	if <condition> {
+		action1;
+		action2;
+		...
+		}
+
+ACTIONS: 
+
+	reject, redirect, fileinto, discard, keep, stop, vacation
+
+	keep - keep a copy of the message in the default folder; cancels discards
+	fileinto "folderName" - store the message in the specified folder
+	discard - delete the message permanently whithout notifying the user
+	reject "reason string" - bounce back the message to originator
+	redirect "email_address" - redirect the message (optional keep a copy)
+
+	*The command keep is executed automatically if no other action is taken
+
+	*For some actions you may have to load additional modules using the require operation.
+	*The actions used in a script need to be declared in a require section before any tests
+	require ["fileinto", "reject", "vacation", "regex", "relational", "comparator-i;ascii-numeric"];
+
+
+TESTS: 
+
+	size
+	header 
+	address
+	* address can match on :domain, :localpart, or :all, from "To", "From", "CC", and "BCC"
+	* Often, addresses are in the form "Firstname Lastname" <localpart@domain>.
+	 The "address" test conveniently matches only the email address itself, not a person's name and not the < and > characters.
+	
+	*Examples:
+		if address :matches :domain "To" "*.com"
+		if address :is "from" ["gigi@gmail.com","gogo@yaho.com","daniel@hotmail.com"] 
+		if address :is ["from","to"] "daniel@gmail.com"
+		if address :is ["from","to"] ["daniel@gmail.com","gigi@hotmail.com","gogo@yahoo.com"]
+
+	envelope
+	* same as with address evaluation, only that it requires the module "envelope"
+	* also supports :domain :localpart :all
+	allof (size :over 1024K, address :is "From" "jdoe@gmial.com")
+	anyof (size :over 1024K, address :is "From" jdoe@gmail.com)
+	
+	*Examples:
+		if allof ( header :contains "From" "gigi@gmail.com",
+			address :is "to" "john@gmail.com")
+		if anyof ( test1, test2, ...)
+	
+	true
+	false
+	not <test>
+
+COMPARATORS: 
+
+	:is - an exact equality match of two strings
+	:contains - test if one string contains another
+	:matches - allow to specify wild characters in match strings (? and *)
+	:over
+	:under
+	:count
+
+
+OUT OF OFFICE REPLIES WITH VACATION
+
+	vacation [":days" number] [":subject" string]
+                 [":from" string] [":addresses" string-list]
+                 [":mime"] [":handle" string] <reason: string>
+
+	:days - interval to suppress the ooo replies after they have been sent
+	:addresses - optional supplimentary addresses
+	:subject - optional subject
+	:from - reply to address for OOO
+	:handle - if you have multiple vacation actions in your script, use handle to differentiate them
+
+
+
+FILTER RULES EXAMPLES
+
+require ["fileinto", "mailbox"];
+if address "From" "someone@example.org"
+{
+    fileinto :create "INBOX.Someone";
+}
+
+require "fileinto";
+if address "From" "someone@example.org"
+{
+    fileinto "INBOX.Someone";
+}
+
+require "fileinto";
+if address :domain "From" "example.org"
+{
+    fileinto "INBOX.Trash";
+}
+
+
+require ["fileinto", "mailbox"];
+if address "To" "personal@example.com"
+{
+    fileinto :create "INBOX.Personal";
+}
+
+
+require "fileinto";
+if address :contains "From" "@example.org"
+{
+    fileinto "INBOX.Trash";
+}
+
+require ["envelope", "fileinto", "mailbox"];
+if envelope "To" "personal@example.com"
+{
+    fileinto :create "INBOX.Personal";
+}
+
+
+require ["envelope", "fileinto", "mailbox"];
+if envelope "From" "someone@i-dont-like.com"
+{
+    fileinto :create "INBOX.Trash";
+}
+
+if envelope :domain "From" "spammer.com"
+{
+    fileinto :create "INBOX.Spam";
+}
+
+
+require ["fileinto", "mailbox"];
+if not address ["To", "CC"] "address@example.com"
+{
+    fileinto :create "INBOX.Low Priority";
+}
+
+require ["fileinto", "mailbox"];
+if anyof
+    (
+        header "Precedence" "list",
+        header "Precedence" "bulk",
+        exists "List-Id"
+    )
+{
+    fileinto :create "INBOX.Low Priority";
+}
+
+require ["body", "fileinto", "mailbox"];
+if allof
+    (
+        header :contains "X-Spam-Level" "*********",
+        not header :contains "Subject" "tiger",
+        not body :contains "tiger"
+    )
+{
+    fileinto :create "INBOX.Spam";
+}
+
+require ["fileinto", "mailbox"];
+if header :contains "Subject" [
+  "confirm your subscription",
+  "confirmation of subscription",
+  "subscription confirmation",
+  "please confirm subscription",
+  "confirmation instructions",
+  "confirm mailing list subscription"
+  ]
+{
+    fileinto :create "INBOX.Signups";
+} 
+
+require ["copy"];
+if header :contains "Subject" "tiger"
+{
+    redirect :copy "other@example.net";
+}
+
+require ["copy", "fileinto", "mailbox"];
+if header :contains "Subject" "tiger"
+{
+    redirect :copy "other@example.net";
+    fileinto :create "INBOX.Forwarded Messages";
+}
+
+if header :contains "Subject" "tiger"
+{
+    redirect "other@example.net";
+}

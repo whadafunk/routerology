@@ -1,0 +1,11 @@
+#!/bin/sh
+#kill dhcp client for eth0
+if [ -f /var/run/udhcpc.eth0.pid ]; then
+kill $(cat /var/run/udhcpc.eth0.pid)
+sleep 0.1
+fi
+
+# configure interface eth0
+ifconfig eth0 192.0.0.38 netmask 255.255.254.0 broadcast 192.0.1.255 up
+route add default gw 192.0.0.1
+

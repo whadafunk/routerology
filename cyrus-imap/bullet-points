@@ -1,0 +1,34 @@
+- config directory: log, proc, mailboxes.db, quota
+- mailboxes directories: header, index, message files, seen, cache
+- cyrus utilities: reconstruct, quota, cyradm, sieveshell -> cyrus-common, cyrus-admin, cyrus-clients
+- acl permissions: l (lookup), r(read), s(seen flags), i (insert), p(post), c(create/delete), a(administer)
+- negative rights
+- mail partitions, news partition, sieve directory
+- mail posting (host, sendmail)
+- virtual domain
+- quota and quota-roots; quotas are expressed in kbytes
+
+
+How quota works:
+
+Quota roots are specified in the mailboxes file
+For each quota root from mailboxes there is a file under the config_directory/quota
+that specifies quota usage (in bytes), quota limit (kbytes)
+
+Other supporting programs:
+
+- dohash / rehash / undohash
+- ctl_cyrusdb, ctl_deliver, ctl_mboxlist
+- ipurge
+- mbpath
+- squatter (fulltext index)
+
+Logging per user
+
+- Create a directory with the name of the user under /conf_dir/log
+
+VIRTUAL DOMAIN
+
+- when imap receives a username of form user@domain.com, it knows how to parse the user and domain part separatedly
+- when saslauthd is used it will send to it user@domain, but saslauthd can handle the domain part also separated
+- if you do user@default_domain you can be the cyradm specified unqualified in the config file

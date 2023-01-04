@@ -1,0 +1,354 @@
+soft_bounce = no
+
+#
+command_directory = /usr/sbin
+daemon_directory = /usr/libexec/postfix
+data_directory = /var/lib/postfix
+config_directory = /etc/postfix
+queue_directory = /var/spool/postfix
+default_database_type = hash
+
+mail_name=Postfix-BitSoft
+smtpd_banner=$myhostname ESMTP $mail_name (Custom/GNU)
+
+
+
+mydomain = bit-soft.lab
+myhostname = mails.bit-soft.ro
+myorigin = $mydomain
+
+mynetworks = 192.0.0.0/23
+
+
+inet_interfaces = all
+proxy_interfaces = 195.163.104.101
+inet_protocols = ipv4
+smtpd_peername_lookup = yes
+#smtpd_bind_address = 
+#lmtps_bind_address = 
+
+mail_owner = postfix
+default_privs = nobody
+
+
+syslog_facility = mail
+syslog_name = ${multi_instance_name:postfix}${multi_instance_name?$multi_instance_name}
+# The service_name parameter can be used in master.cf to distinguish
+# between multiple instances of the same program
+# $service_name is a read-only parameter but you can use it with syslog_name
+#service_name =
+
+####             SASL AUTHENTICATION        ####
+
+smtpd_sasl_auth_enable = yes
+smtpd_sasl_type = cyrus
+broken_sasl_auth_clients = yes
+smtpd_sasl_security_options = noanonymous
+smtpd_sasl_tls_security_options = $smtpd_sasl_security_options
+# You can move $smtpd_tls_auth_only to master.cf
+smtpd_tls_auth_only = yes
+#smtpd_sasl_local_domain =
+smtpd_sasl_path = smtpd
+smtpd_sasl_authenticated_header = yes
+#smtpd_sasl_exceptions_networks =
+
+
+####              TLS SUPPORT            ####
+
+#tls_ssl_options =
+#               ENABLE_MIDDLEBOX_COMPAT, LEGACY_SERVER_CONNECT,
+#               NO_TICKET, NO_COMPRESSION, NO_RENEGOTIATION,
+#               NO_SESSION_RESUMPTION_ON_RENEGOTIATION, PRIORITIZE_CHACHA
+tls_append_default_CA = yes
+#smtpd_use_tls = ***Legacy opportunistic TLS encryption
+#smtpd_enforce_tls = ***Legacy mandatory TLS encryption
+smtpd_tls_wrappermode = no
+smtpd_tls_security_level = may
+smtpd_tls_CAfile = /etc/postfix/pki/mails.bit-soft.ro_ca.pem
+smtpd_tls_CApath =
+smtpd_tls_cert_file = /etc/postfix/pki/mails.bit-soft.ro_client.pem
+smtpd_tls_key_file = /etc/postfix/pki/mails.bit-soft.ro.key
+smtpd_tls_ccert_verifydepth = 9
+smtpd_tls_ask_ccert = no
+smtpd_tls_req_ccert = no
+smtpd_tls_fingerprint_digest = sha256
+#smtpd_tls_protocols = TLSv1, <=TLSv1.3
+smtpd_tls_mandatory_protocols = $smtpd_tls_protocols
+smtpd_tls_ciphers = medium
+smtpd_tls_mandatory_ciphers = $smtpd_tls_ciphers
+smtpd_tls_exclude_ciphers = aNULL, MD5
+smtpd_tls_mandatory_exclude_ciphers = $smtpd_tls_exclude_ciphers
+smtpd_tls_received_header = no
+smtpd_tls_loglevel = 0
+
+### SMTP TLS CLIENT OPTIONS  ####
+
+#smtp_use_tls = yes
+#smtp_enforce_tls = no
+#smtp_tls_security_level = may
+#smtp_tls_session_cache_database = /var/lib/postfix/smtp_cache
+#smtp_tls_enforce_peername = no
+#smtp_tls_CAfile
+#smtp_tls_cert_file = /etc/postfix/pki/mails.bit-soft.ro_client.pem
+#smtp_tls_key_file = /etc/postfix/pki/mails.bit-soft.ro.key
+#smtp_tls_chain_files = /etc/postfix/pki/mails.bit-soft.ro_chain.pem
+#smtp_tls_protocols =  >=TLSv1, <=TLSv1.3
+#smtp_tls_mandatory_protocols = $smtp_tls_protocols
+#smtp_tls_ciphers = medium
+#smtp_tls_mandatory_ciphers = $smtp_tls_ciphers
+#smtp_tls_exclude_ciphers = aNULL, MD5
+#smtp_tls_mandatory_exclude_ciphers = $smtp_tls_exclude_ciphers
+#smtp_tls_connection_reuse = no
+#smtp_tls_fingerprint_digest = sha256
+#smtp_tls_note_starttls_offer = no
+#smtp_tls_loglevel = 0
+
+######              LOCAL ADDRESS CLASS     #######
+
+mydestination = $myhostname, bit-soft.lab, packets.cf, packets.lab, routerology.cf
+#local_recipient_maps = hash:/etc/postfix/recipient_maps/local_recipient_maps
+local_recipient_maps = mysql:/etc/postfix/recipient_maps/sql_local_recipient_maps.cf
+local_recipient_maps =
+alias_maps = hash:/etc/postfix/alias_maps/aliases
+alias_database = hash:/etc/postfix/alias_maps/aliases
+local_transport = local:$myhostname
+mail_spool_directory = /var/spool/mail/
+fallback_transport = lmtp:192.0.0.32
+unknown_local_recipient_reject_code = 550
+luser_relay =
+relayhost = 
+
+#relay_domains = bit-soft.ro
+#relay_domains_reject_code = 554
+#relay_transport = relay:[smtp.office365.com]
+#relay_recipient_maps =
+
+#####               CLEANUP ACTIONS          ########
+
+
+#receive_override_options =
+#               no_unknown_recipient_checks, no_milters,
+#               no_address_mappings, no_header_body_checks
+
+#local_header_rewrite_clients = permit_inet_interfaces,
+#                                permit_my_networks,
+#                                permit_sasl_authenticated
+
+#remote_header_rewrite_domain = invalid.domain
+
+#canonical_classes = envelope_sender, envelope_recipient,
+#           header_sender, header_recipient
+#canonical_maps = hash:canonical_maps/canonical_maps
+#sender_canonical_maps = hash:canonical_maps/sender_canonical_maps
+#recipient_canonical_maps = hash:canonical_maps/recipient_canonical_maps
+
+#masquerade_classes = envelope_sender, envelope_recipient
+#            header_sender, header_recipient
+#masquerade_domains = sandbox.lab, !nothisone.sandbox.lab
+#masquerade_exceptions = nothisone.sandbox.lab
+
+#always_bcc =
+#recipient_bcc_maps =
+#sender_bcc_maps =
+
+####      BUILT IN CONTENT FILTER   #####
+
+#body_checks =
+#body_checks_size_limit = 51200
+#header_checks =
+#header_size_limit = 102400
+
+
+######               SECURITY AND RELAY CONTROLS          ######
+
+message_size_limit = 10240000
+smtpd_recipient_limit = 100
+smtpd_authorized_xclient_hosts =
+smtpd_authorized_xforward_hosts =
+content_filter =
+smtpd_proxy_filter =
+default_filter_nexthop =
+
+smtpd_helo_required = yes
+strict_rfc821_envelopes = yes
+disable_vrfy_command = yes
+soft_bounce = no
+#relay_clientcerts = hash:cert_maps/relay_clientcerts
+
+smtpd_delay_reject = yes
+# Logs all permit actions; or selective
+#smtpd_log_access_permit_actions = static:all
+
+smtpd_reject_unlisted_recipient = yes
+smtpd_reject_unlisted_sender = no
+
+
+########        MUA   SMTPD RELAY RESTRICTIONS        #######
+
+mua_client_restrictions =
+        permit_mynetworks,
+        permit_inet_interfaces,
+        permit_sasl_authenticated,
+        reject
+
+#######     NORMAL SMTPD RELAY RESTRICTIONS    ######
+
+
+smtpd_client_restrictions =
+        check_client_access hash:/etc/postfix/access_maps/client_access_maps,
+        #check_sasl_access hash:/etc/postfix/access_maps/sasl_access_maps
+        #check_ccert_access hash:/etc/postfix/access_maps/ccert_maps,
+        permit_mynetworks,
+        permit_inet_interfaces,
+        permit_sasl_authenticated,
+#       permit_tls_all_clientcerts,
+#       permit_tls_clientcerts,
+#       permit_dnswl_client wl.packets.lab,
+#        reject_rbl_client zen.spamhaus.org,
+        reject_unknown_reverse_client_hostname
+
+smtpd_helo_restrictions =
+#       check_helo_access hash:access_maps/helo_acces_maps,
+        reject_invalid_helo_hostname,
+#       reject_unknown_helo_hostname,
+        reject_non_fqdn_helo_hostname,
+#       reject_rhsbl_helo_rbl_domain = rhsbl.spamhau.org
+
+#smtpd_sender_login_maps = hash:/etc/postfix/sender_login_maps
+
+smtpd_sender_restrictions =
+#       check_sender_access hash:/etc/postfix/access_maps/sender_access_maps,
+#       reject_sender_login_mismatch,
+#       reject_authenticated_sender_login_mismatch,
+#       reject_unauthenticated_sender_login_mismatch,
+#       reject_known_sender_login_mismatch,
+        reject_non_fqdn_sender,
+#       reject_unknown_sender_domain
+
+smtpd_recipient_restrictions =
+#       check_recipient_access hash:/etc/postfix/access_maps/recipient_access_maps,
+        permit_sasl_authenticated,
+        permit_mynetworks,
+        reject_unauth_destination,
+        reject_non_fqdn_recipient,
+        reject_non_fqdn_sender,
+#       reject_unknown_recipient_domain,
+        reject_unlisted_recipient,
+        permit_auth_destination,
+        reject
+
+smtpd_relay_restrictions =
+
+smtpd_data_restrictions =
+
+
+
+# INPUT RATE CONTROL
+#
+# The in_flow_delay configuration parameter implements mail input
+# flow control. This feature is turned on by default, although it
+# still needs further development (it's disabled on SCO UNIX due
+# to an SCO bug).
+# 
+# A Postfix process will pause for $in_flow_delay seconds before
+# accepting a new message, when the message arrival rate exceeds the
+# message delivery rate. With the default 100 SMTP server process
+# limit, this limits the mail inflow to 100 messages a second more
+# than the number of messages delivered per second.
+# 
+# Specify 0 to disable the feature. Valid delays are 0..10.
+# 
+#in_flow_delay = 1s
+#local_destination_recipient_limit = 300
+#local_destination_concurrency_limit = 5
+#local_destination_concurrency_limit = 2
+#default_destination_concurrency_limit = 20
+
+# DEBUGGING CONTROL
+#
+# The debug_peer_level parameter specifies the increment in verbose
+# logging level when an SMTP client or server host name or address
+# matches a pattern in the debug_peer_list parameter.
+#
+debug_peer_level = 4
+
+# The debug_peer_list parameter specifies an optional list of domain
+# or network patterns, /file/name patterns or type:name tables. When
+# an SMTP client or server host name or address matches a pattern,
+# increase the verbose logging level by the amount specified in the
+# debug_peer_level parameter.
+#
+debug_peer_list = 127.0.0.1
+#debug_peer_list = some.domain
+
+# The debugger_command specifies the external command that is executed
+# when a Postfix daemon program is run with the -D option.
+#
+# Use "command .. & sleep 5" so that the debugger can attach before
+# the process marches on. If you use an X-based debugger, be sure to
+# set up your XAUTHORITY environment variable before starting Postfix.
+#
+debugger_command =
+	 PATH=/bin:/usr/bin:/usr/local/bin:/usr/X11R6/bin
+	 ddd $daemon_directory/$process_name $process_id & sleep 5
+
+# If you can't use X, use this to capture the call stack when a
+# daemon crashes. The result is in a file in the configuration
+# directory, and is named after the process name and the process ID.
+#
+# debugger_command =
+#	PATH=/bin:/usr/bin:/usr/local/bin; export PATH; (echo cont;
+#	echo where) | gdb $daemon_directory/$process_name $process_id 2>&1
+#	>$config_directory/$process_name.$process_id.log & sleep 5
+#
+# Another possibility is to run gdb under a detached screen session.
+# To attach to the screen sesssion, su root and run "screen -r
+# <id_string>" where <id_string> uniquely matches one of the detached
+# sessions (from "screen -list").
+#
+# debugger_command =
+#	PATH=/bin:/usr/bin:/sbin:/usr/sbin; export PATH; screen
+#	-dmS $process_name gdb $daemon_directory/$process_name
+#	$process_id & sleep 1
+
+# INSTALL-TIME CONFIGURATION INFORMATION
+#
+# The following parameters are used when installing a new Postfix version.
+# 
+# sendmail_path: The full pathname of the Postfix sendmail command.
+# This is the Sendmail-compatible mail posting interface.
+# 
+sendmail_path = /usr/sbin/sendmail.postfix
+
+# newaliases_path: The full pathname of the Postfix newaliases command.
+# This is the Sendmail-compatible command to build alias databases.
+#
+newaliases_path = /usr/bin/newaliases.postfix
+
+# mailq_path: The full pathname of the Postfix mailq command.  This
+# is the Sendmail-compatible mail queue listing command.
+# 
+mailq_path = /usr/bin/mailq.postfix
+
+# setgid_group: The group for mail submission and queue management
+# commands.  This must be a group name with a numerical group ID that
+# is not shared with other accounts, not even with the Postfix account.
+#
+setgid_group = postdrop
+
+# html_directory: The location of the Postfix HTML documentation.
+#
+html_directory = no
+
+# manpage_directory: The location of the Postfix on-line manual pages.
+#
+manpage_directory = /usr/share/man
+
+# sample_directory: The location of the Postfix sample configuration files.
+# This parameter is obsolete as of Postfix 2.1.
+#
+sample_directory = /usr/share/doc/postfix-2.10.1/samples
+
+# readme_directory: The location of the Postfix README files.
+#
+readme_directory = /usr/share/doc/postfix-2.10.1/README_FILES

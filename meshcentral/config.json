@@ -1,0 +1,150 @@
+{
+  "$schema": "http://info.meshcentral.com/downloads/meshcentral-config-schema.json",
+  "__comment2__": "See node_modules/meshcentral/sample-config-advanced.json for a more advanced example.",
+  "settings": {
+    "_maintenanceMode": true,
+    "cert": "mesh.bit-soft.ro",
+    "_WANonly": true,
+    "_LANonly": false,
+    "_sessionKey": "session_cookie_encrypt_pwd",
+    "exactPorts": true,
+    "port": 443,
+    "aliasPort": 443,
+    "_portBind": "0.0.0.0",
+    "redirPort": 80,
+    "redirAliasPort": 80,
+    "_mpsPort": 4433,
+    "_mpsAliasPort": 4433,
+    "tlsOffload": "172.16.100.2,192.168.101.195",
+    "_trustedProxy": "172.16.100.2,192.168.101.195",
+    "agentPong": 50,
+    "browserPong": 100,
+    "mongoDb": "mongodb://databee.bit-soft.ro:27017",
+    "mongoDbName": "mesh",
+    "_dbEncryptKey_": "ecnrypt configuration files in database",
+    "_dbEncryptKey": "s3cret",
+    "dbRecordsEncryptKey": "secr3t",
+    "_dbRecordsDecryptKey": "secr3t",
+    "webRTC": true,
+    "webrtcConfig": {
+      "iceServers": [
+        { "urls": "stun:stun.services.mozilla.com" },
+        { "urls": "stun:stun.l.google.com:19302" }
+      ]
+    },
+    "log": "main,web,webrequest,cert",
+    "_syslog": "meshcentral",
+    "_syslogauth": "meshcentral-auth",
+    "_syslogjson": "meshcentral-json",
+    "_syslogtcp": "172.16.100.1:514",
+    "selfUpdate": true,
+    "_userAllowedIP": "1.1.1.1,192.168.10.0/24",
+    "_userBlockedIP": "1.2.3.0/24,102.1.1.1",
+    "webPush": { "email": "admin@bit-soft.local" },
+    "publicPushNotifications": true,
+    "autoBackup": {
+      "_mongoDumpPath": "/usr/bin/mongodump",
+      "backupIntervalHours": 24,
+      "keepLastDaysBackup": 10,
+      "zipPassword": "backupS3cret",
+      "backupPath": "/home/node/meshcentral/meshcentral-backups"
+      }
+
+  },
+  "_domaindefaults": {
+    "__comment__": "Any settings in this section is used as default setting for all domains",
+    "title": "MyDefaultTitle",
+    "footer": "Default page footer",
+    "newAccounts": false,
+    "_titlePicture": "title-sample.png",
+    "_loginPicture": "title-sample.png",
+    "_mobileSite": true,
+    "_unknownUserRootRedirect": "https://www.youtube.com/watch?v=2Q_ZzBGPdqE",
+    "_userQuota": 1048576,
+    "_meshQuota": 248576
+  },
+
+  "domains": {
+    "": {
+      "title": "BitSoft Mesh",
+      "title2": "Remote Control Service",
+      "minify": true,
+      "_newAccounts": true,
+      "CertUrl": "https://mesh.bit-soft.ro",
+      "authStrategies": {
+                "azure": {
+                "newAccounts": true,
+                "clientid": "2abe7a90-7fa7-429c-a9d1-72b75ca6499a",
+                "clientsecret": "EuH8Q~ExoN621cD_iJvmVJ5N0IdZr9qd~3mFdbmd",
+                "tenantid": "f81f802a-c018-49d8-bce3-7a9924b330d4"
+                }
+        },
+        "sessionRecording": {
+        	"_onlySelectedUsers": true,
+        	"onlySelectedUserGroups": true,
+        	"onlySelectedDeviceGroups": true,
+        	"filepath": "/home/node/meshcentral/recordings",
+        	"index": true,
+        	"maxRecordings": 101,
+        	"maxRecordingDays": 15,
+        	"maxRecordingSizeMegabytes": 100,
+        	"__protocols__": "Is an array: 1 = Terminal, 2 = Desktop, 5 = Files, 100 = Intel AMT WSMAN, 101 = Intel AMT Redirection, 200 = Messenger",
+        	"protocols": [ 1, 2, 5, 200, 101 ]
+      	},
+        "ipkvm": true,
+        "PreconfiguredScripts": [
+                {
+                        "name": "run my shit",
+                        "file": "scripts/myshit.bat",
+                        "type": "bat",
+                        "runas": "user"
+                },
+                {
+                        "name": "run my notepad",
+                        "file": "notepad.exe",
+                        "type": "bat",
+                        "runas": "agent"
+                }
+        ],
+        "deviceMeshRouterLinks": {
+                "rdp": true,
+                "ssh": true,
+                "scp": true,
+                "extralinks": [
+                        {
+                        "name": "gelu",
+                        "protocol": "https",
+                        "port": 443,
+                        "ip": "1.2.3.4"
+                        },
+                        {
+                        "name": "antigelu",
+                        "protocol": "https",
+                        "port": 443,
+                        "ip": "1.4.3.4"
+                        }
+                ]
+        },
+
+      "userNameIsEmail": false
+    }
+  },
+
+  "smtp": {
+        "host": "mailpipe.bit-soft.ro",
+        "name": "mesh.bit-soft.ro",
+        "port": 25,
+        "from": "admin@bit-soft.local",
+        "_user": "admin@bit-soft.local",
+        "_pass": "adminadmin",
+        "tls": false
+
+  },
+  "_letsencrypt": {
+    "__comment__": "Requires NodeJS 8.x or better, Go to https://letsdebug.net/ first before trying Let's Encrypt.",
+    "email": "myemail@mydomain.com",
+    "names": "myserver.mydomain.com",
+    "production": false
+  }
+}
+

@@ -95,7 +95,7 @@
 
 ## Mail and notifications
 
-- SSMTP
+- SSMTP or MSMTP
 
 
 ## Authentication packages
@@ -108,5 +108,6 @@
 
 - Cockpit
 - Webmin
+- Ajenti
 
 

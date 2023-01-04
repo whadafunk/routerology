@@ -1,0 +1,37 @@
+
+(&(objectClass=person)(objectClass=user))
+(|(objectClass=person)(objectClass=user))
+(&(objectClass=user)(cn=*Marketing*))
+(&(objectClass=user)(objectClass=top)(objectClass=person))
+
+
+(&(objectClass=group)(|(ou:dn:=Chicago)(ou:dn:=Miami)))
+
+will find groups with an OU component of their DN which is either 'Chicago' or 'Miami'. 
+This will only synchronize users in the 'CaptainPlanet' group
+
+(&(objectCategory=Person)(sAMAccountName=*)(memberOf=cn=CaptainPlanet,ou=users,dc=company,dc=com))
+
+And this will search for users that are a member of this group, either directly or via nesting:
+
+(&(objectCategory=Person)(sAMAccountName=*)(memberOf:1.2.840.113556.1.4.1941:=cn=CaptainPlanet,ou=users,dc=company,dc=com)
+
+)
+
+This will search for users who are a member of any or all the 4 groups (fire, wind, water, heart)
+
+(&(objectCategory=Person)(sAMAccountName=*)(|(memberOf=cn=fire,ou=users,dc=company,dc=com)(memberOf=cn=wind,ou=users,dc=company,dc=com)(memberOf=cn=water,ou=users,dc=company,dc=com)(memberOf=cn=heart,ou=users,dc=company,dc=com)))
+
+This will search for users that have an email address
+
+(&(objectCategory=Person)(sAMAccountName=*)(mail=*))
+
+This will search for users that have an email address and are a member of any or all of the groups in the filter below
+
+(&(objectCategory=Person)(sAMAccountName=*)(mail=*)(|(memberOf=cn=fire,OU=Atlassian Groups,dc=xxxx,dc=com)(memberOf=cn=wind,OU=Atlassian Groups,dc=xxxx,dc=com)(memberOf=cn=water,OU=Atlassian Groups,dc=xxxx,dc=com)(memberOf=cn=heart,OU=Atlassian Groups,dc=xxxx,dc=xxxx)))
+
+This will search and import users from different CNs when added to User Object Filter . As a result users from "Jira Administrators", "jira-users" and "confluence-administrators" will be synced to the Atlassian application.
+
+(&(objectCategory=Person)(sAMAccountName=*)(|(memberOf=CN=Jira Administrators,CN=Users,DC=test,DC=mydomain,DC=com)(memberOf=CN=jira-users,CN=Users,DC=test,DC=mydomain,DC=com)(memberOf=CN=confluence-administrators,CN=Users,DC=test,DC=mydomain,DC=com)))
+
+

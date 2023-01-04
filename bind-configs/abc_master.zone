@@ -1,0 +1,45 @@
+; There are a couple of less known parameters of the zone file
+; and those are the TTL that can be set both generic or per each resource
+; and ORIGIN which if not specified, defaults to the zone name as
+; declared in the named.conf file 
+; Origin is appended to any owner attribute that is not fully qualified 
+; meaning is not having a final dot at the end.
+; An important detail, is that the $ORIGIN string should be fully qualified
+; and end with a dot "."; otherwise bind throws and error about SOA not being the first record
+; Records that do not have the owner explicit specified, will 
+; use the origin
+; Also, if you want to use origin for the owner of the record 
+; a common practice is to use the "@" symbol
+; Pay special attention if you end the owner with a final dot "."
+; cause if you use a final dot, the origin is not appended anymore
+; $ORIGIN is also appended to the record values (rhs), if not fully qualified
+; but the practice is to use the final dot for the values on the right
+; SOA must be the first record of the zone. Before it only comments
+; and variables are allowed
+; It's manadatory that each zone have a NS record
+; The primary nameserver and the email address do not need to have the final dot
+; but it doesn't hurt to use it for consistency
+; a record general syntax looks like this:
+; owner.subdomain	TTL	CLASS	TYPE	VALUE
+; For the mx you need to also specify a priority
+; owner.subdomain	TTL	IN	MX	10	VALUE
+$ORIGIN abc.com.
+$TTL 300 ; this is the default value
+
+@	IN	SOA	ns.abc.com. email_admin.abc.com. (
+			100	; Serial
+			7200	; Refresh
+			3600	; Retry
+			432000	; Expire
+			86400)	; Negative Cache TTL
+
+@	IN	A	1.1.1.1
+@	IN	NS	ns1
+@	IN	NS	ns2
+@	IN	MX	10	mx1
+@	IN	MX	20	mx2
+mx1	IN	A	1.1.1.1
+mx2	IN	A	1.1.1.2
+www	IN	CNAME	abc.com.
+			
+

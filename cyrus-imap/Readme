@@ -1,0 +1,81 @@
+Cyrus IMAPD
+
+
+Cyrus IMAPD is a package that contains more than just imap. Actually if you look at the available packages you will see that there are a couple of packages that make up the cyrus imap paradigm. 
+
+cyrus-imapd (imapd and idled for newmail notifications)
+cyrus-common (mostly libraries, plus the maintenance tools like reconstruct)
+cyrus-admin (cyradm and other utilities to manage the system)
+cyrus-clients (testing clients for imap, pop3, smtp, sieve, etc)
+…  plus other components.
+cyrus-caldav
+cyrus-pop3d
+cyrus-nntpd
+
+
+To sum up the important features of the Cyrus IMAP:
+
+IMAP/S Server
+Support for sieve scripts creation and management
+Security Features (ACL, Quota)
+Calendar sync through webdav plugins (Cardav, Caldav)
+SASL Authentication
+Mailbox management (through various perl scripts)
+NetNews
+
+
+
+
+Important configuration aspects
+
+Location of configuration files (/etc/imapd.conf, /etc/cyrus.conf)
+Location of configuration directory (metadata, lock files, logs, socket files, backup, etc)
+Mailbox location (default partition is at /var/spool/imap)
+Binaries and perl tools (/usr/lib/cyrus)
+Testing tools and Cyradm
+/usr/bin/cyradm
+/usr/bin/imtest
+/usr/bin/installsieve
+/usr/bin/lmtptest
+/usr/bin/notifytest
+/usr/bin/pop3test
+/usr/bin/sieveshell
+/usr/bin/sivtest
+/usr/bin/smtptest
+/usr/bin/synctest
+Daemon starting in cyrus.conf
+imapd
+sieve
+lmtp
+Imapd.conf aspects
+Define partitions
+Activate virtual domains and define login realms
+Designate global and domain admins
+Configure namespace and hierarchy separation
+Configure authentication (think of anonymous auth as well)
+Configure autocreation and autosubscription
+
+
+IMAP Namespace
+
+One of the
+
+One of the important things that you need to grasp is the imap namespace, which of course is different from the file system namespace. 
+The imap namespace represents the mailboxes and folder names as they are returned as response to imap commands like list.
+
+There are three type of folder that we can subscribe to:
+
+user mailboxes - all user mailboxes are starting with the name user
+other user mailboxes 
+shared folders
+
+These folders will appear in the imap namespace differently, depending on the some of the settings in imapd.conf
+
+altnamespace:  - this parameter influences how the mailboxes are displayed (not as they are stored)
+userprefix
+sharedprefix
+unixhierarchysep
+	
+
+The unixhierarchysep is the most important one from the four, because it allows for user accounts with dot in the name (like joey.starr). It replaces the "." with the "/" as the hierarchy separator. 
+

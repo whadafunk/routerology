@@ -1,0 +1,43 @@
+# nslcd.conf parameters
+
+
+- threads	*NUM*
+- uid		*UID* -> it can be a numerical id or a symbolic value
+- gid		*GID* -> it can be a numerical id or a symbolic value
+- log		*SCHEME [LEVEL]*; scheme can be a filename or syslog
+- uri		*URI* -> the ldap uri; ldap://, ldapi://, or ldaps:// (which means ldap over TCP, ICP or SSL)
+- ldap_version	*VERSION*
+- binddn	*DN*
+- bindpw	*PASSWORD*
+- rootpwmoddn	*DN* -> the DNS of the root that will be used to modify a user's password using PAM module
+- rootpwmodpw	*PASSWORD*
+- base		*[MAP] DN* -> the search base that can be also specified per map (passwd, shaddow, group, etc)
+- scope 	*[MAP] sub[tree] | one[level] | base -> default sub
+- filter	*[MAP] FILTER* -> filters can be specified per map
+- ignorecase	*yes | no*
+- nss_uid_offset	*NUMBER*
+- nss_gid_offset	*NUMBER* 
+- nss_nested_groups	*yes | no*
+- map		*MAP ATTRIBUTE NEWATTRIBUTE*
+	- passwd entries:
+		- gidNumber
+		- gecos
+		- homeDirectory
+		- loginShell
+	- shadow entries:
+		-shadowLastChange
+		-shadowMinT
+		-shadowMaxT
+		-shadowWarningT
+		-shadowInactiveT
+		-shadowExpireT
+		-shadowFlagT
+- ssl		*on | off | start_tls
+- tls_reqcert	*never | allow | try | demand*
+- tls_cacertdir	*PATH*
+- tls_cacertfile	*PATH*
+- tls_cert	*PATH*
+- tls_key	*PATH*
+
+- validnames	*REGEX*
+	- ex: /.*/
