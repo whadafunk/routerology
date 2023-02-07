@@ -9,27 +9,25 @@
 
 > ovftool package.ovf -ds=storage1 vi://my.esx-machine.example.com/ 
 
-Deploying an OVF Package to vCenter Server
+### Deploying an OVF Package to vCenter Server
 
-The following command deploys testVM.ovf from a local Windows disk to a data store named storage1 in host (12.98.76.54) from vCenter (12.34.56.789). the VM will be named myVM on the host. (To test this on your system, replace the incorrect IP addresses in this example with your actual data store and host IP addresses.)
+### The following command deploys testVM.ovf from a local Windows disk to a data store named storage1 in host (12.98.76.54) from vCenter (12.34.56.789). the VM will be named myVM on the host.
 
 > ovftool -ds=storage1 -n=myVM C:\testVM.ovf vi://user1:passwd@12.34.56.789/?ip=12.98.76.54.
 
-OVF Tool can power on a virtual machine or vApp after deployment. This action can be done on all supported platforms. The following example powers on the VM or vApp on a particular host through vCenter Server:
+### OVF Tool can power on a virtual machine or vApp after deployment.
 
 > ovftool --powerOn package.ovf vi://MyvCenterServer/?dns=fast-esx-host1.example.com. 
 
-You can deploy an OVF package from OVF Tool into vCloud Director. The following example connects to vCloud Director and deploys the OVF package LAMP.ovf.
+### You can deploy an OVF package from OVF Tool into vCloud Director.
 
 > ovftool --net:"VM Network=intnet" LAMP.ovf "vcloud://jd:PASSWORD@example.com:443/? org=myOrg&vapp=test1&vdc=orgVdc&catalog=catalog" 
-
-
 > ovftool http://my_ovflib/vm/my_vapp.ovf \
            vcloud://username:pass@my_cloud?org=MyOrg&vdc=MyVDC&catalog=MyCatalog&vapp=myVapp
 
 (Imports an OVF from http into a vCloud instance and names the vApp myVapp) 
 
-The following command imports a virtual machine from vSphere into a vCloud instance and names the resulting vApp ‘myVapp’.
+### The following command imports a virtual machine from vSphere into a vCloud instance and names the resulting vApp ‘myVapp’.
 
 > ovftool vi://username:pass@my_host/my_datacenter/vm/my_vm_folder/my_vm_name \
            vcloud://username:pass@my_cloud?org=MyOrg&vdc=MyVDC&catalog=MyCatalog&vapp=myVapp
