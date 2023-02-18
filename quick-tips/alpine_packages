@@ -1,0 +1,8 @@
+# Alpine packages
+
+
+*### some of the alpine packages have different names than the ones we are used with ###*
+
+
+- apk add build-base  
+- util-linux-dev - libuuid-dev
