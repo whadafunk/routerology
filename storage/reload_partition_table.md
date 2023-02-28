@@ -17,6 +17,7 @@ There are a couple of tools you can use to reload the partition table
 - partprobe /dev/sdb
 - blockdev --rereadpt -v /dev/sdb
 - hdparm -z /dev/sdb
+- echo 1 > /sys/block/sdX/device/rescan, *where x is the device in cause*
 
 
 After running one of these commands you should check the output of *dmesg*
