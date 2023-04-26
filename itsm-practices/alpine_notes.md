@@ -1,5 +1,7 @@
 # General notes on Alpine Linux
 
+
+
 ### Repositories
 
 
@@ -25,12 +27,55 @@ There are a couple of branches that you will find in the repository configuratio
 Alpine, being a bare-bones distribution does not come with many tools installed  
 The following is a list with a couple of these packages that are usualy needed
 
-- **shadow package**, includes: useradd, groupadd, usermod, chsh
-- **bash**
-- **coreutils**
-- **sudo**
+#### *Base*
+
+- **open-vm-tools** / **virtualbox-guest-additions** / **qemu-guest-agent** / **xe-guest** - if you are on a virtualmachine 
+- **shadow package** - includes: useradd, groupadd, usermod, chsh
+- **bash** - if you are not happy with busybox which is the default
+- **coreutils** - many of the tools bundled in busybox, in their standalone form: tail, sort, wc, whoami, etc
+- **sudo** - the well known sudo package
+- **vim**, **nano**, or **joe** - whichever you prefer
+- **man-pages** - alpine does not come preinstalled with the man viewer nor the documentation pages
+
+#### *Above base*
+
+- **mc**, **htop**, **tmux**
+- **git**
+- **gpg**
+- **wget** and **curl**
+- **dig** , **nslookup**
+- **openssh**
+- **figlet**
+
+#### *Networking*
+
+- **net-tools**, **nmap**, **tcpdump**, **ngrep**, **nc / netcat**, **hping**
 - **iproute2**; by default this functionality comes from busybox
 
+#### *Security*
+
+- **openssl**
+- **fail2ban**
+- **tripwire**
+
+#### *Software build tools*
+
+- **gcc** and **make** - if you want to compile from sources
+
+
+#### *SMTP and Email tools*
+
+- **ssmtp**, **msmtp**
+- **swaks**
+
+
+#### *Storage*
+
+- **lvm2**
+- **iscsi target and initiator**
+
+>For lvm2 you need to add it service to rc-update - *rc-update add lvm2*
+>For iscsi to work you need to start the service dbus - *rc-update add dbus*
 
 
 ### Man pages
