@@ -3,8 +3,7 @@
 ## Here you will find not only the cheatsheets and command listings I use in my tutorials, 
 ## but various other resources also, organized by directories
 
-
-![Cover Art Image](./img/routerology.png)
+<img src="./img/routerology.png" width="300" />
 
 ## I have grouped in folder various topics
 
