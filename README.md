@@ -1,6 +1,6 @@
 # Routerology Materials
 
-## Here you will find not only the cheatsheets and command listings I use in my tutorials,  
+## Here you will find not only the cheatsheets and command listings I use in my tutorials, 
 ## but various other resources also, organized by directories
 
 
