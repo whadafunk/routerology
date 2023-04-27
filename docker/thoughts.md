@@ -51,4 +51,24 @@ These commands are:
 - There is another way which you can run a process inside the container as non-root. And that is by the way of su
 - Regarding the last option it can be controlled in an init script with env variables
 
-# By 
+# Docker init system
+
+Starting with Docker 1.13, an initialization system based on tini has been implemented for Docker.
+
+```
+Tini is a tiny and simplest init available for containers. It works by spawning a single child and waiting for it to exit while reaping the zombie processes as well as performing signal forwarding.
+```
+
+Tini can be used in more than one way:
+
+- Using the --init option from *docker container run*
+- Using prebuilt tini images, and modifying ENTRYPOINT to *ENTRYPOINT ["/usr/local/bin/tini", "--", "/docker-entrypoint.sh"]*
+- Using precompiled tini packages 
+- Manually adding Tini *ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini*
+
+The easiest way to use tini is by leveraging the --init option in docker  
+This way, whatever you specified in ENTRYPOINT or CMD is passed as argument to /sbin/tini
+
+>Is recomended to use --init whenever you have a container with more than one process
+>A common use-case for me is when I need cron jobs to run in the same container
+
