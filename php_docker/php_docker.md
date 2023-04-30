@@ -8,8 +8,8 @@
 ## Of course there are a couple of ways in which you can add those php module extensions:
 
 - Compile them using docker-php-ext-install, docker-php-ext-configure, docker-php-ext-enable
-- Install them using PECL
-- Using the mlocati script
+- Install them using PECL; this needs docker-php-ext-enable
+- Using the mlocati script; [php-extension-installer](https://github.com/mlocati/docker-php-extension-installer)
 
 
 ## From the above methods, maybe the mlocati script is the easiest one:
@@ -44,6 +44,31 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
 
 RUN install-php-extensions gd xdebug
 
+## Compilation errors
 
+configure: error: utf8_mime2text() has new signature, but U8T_CANONICAL is missing. This should not happen. Check config.log for additional information.
+solution: this is because php won't use IMAP without SSL.
+
+docker-php-ext-configure --with-imap-ssl
+
+## Default php modules included
+
+[PHP Modules]
+Core, ctype, curl, date, dom, fileinfo, filter, ftp, hash,  
+iconv, json, libxml, mbstring, mysqlnd, openssl, pcre,  
+PDO, pdo-sqlite,  Phar, posix, random, readline,  
+Reflection, session, SimpleXML, sodium, SPL, sqlite3,  
+standard, tokenizer, xml, xmlreader, xmlwriter, zlib
+
+## php.ini
+
+The default config can be customized by copying configuration files into the $PHP_INI_DIR/conf.d/
+
+```
+FROM php:7.4-fpm-alpine
+
+# Use the default production configuration
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+```
 
 
