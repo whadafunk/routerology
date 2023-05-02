@@ -85,6 +85,59 @@ Running cron tasks inside a container is not very straight forward. There are mu
 	- Running the cron jobs on a dedicated container (that is only running cron) -> docker container exec *container-name* command
 	- Running the cron jobs as an additional service in the same container, an using tini or other container init system.
 
+Apart from starting and managing the cron service, you also need to bring the crontab files in the container, and of course there are multiple ways  
+to do that:
+
+The most straightforward way is to use crontab with the user and the crontab file as the parameters:
+
+*crontab -u www-data ./mycrontab_file*
+
+The other way would be to copy the crontabs to the /var/spool/cron/crontabs, under the specific user. 
+
+```
+COPY cron.d/glpi /var/spool/cron/crontabs/www-data
+RUN chown -R www-data:www-data /var/spool/cron/crontabs/www-data
+RUN cron /var/spool/cron/crontabs/www-data
+```
+
+**Environment Variables** are another topic that you might have a hard time when dealing with cron, especially in container evironment. 
+Most of the environment variables we see with *printenv* or *env* are set by the bash shell when started as a login shell. When bash starts as a login shell it will first run a couple of scripts like /etc/profile, ~/.profile ~/.bashrc, etc that will load some environment variables. 
+But running jobs with cron doesn't go with login shell, and most of the times the jobs are not started by a shell that can pass env variables to child processes, so there are a couple of ways arround this.
+
+- Set the variables in /etc/environment *most cron implementations will be able to read env variables from there, but not all of them*
+*this following example shows how to pass the environment variables inside the container with an entrypoint.sh script*
+```
+#!/bin/sh
+
+env >> /etc/environment
+# start cron in the foreground (replacing the current process)
+exec "cron -f"
+```
+
+- Set the variables one by one in the crontabs *this can be don apriori to the active lines, with multiple distinct lines, each with one variable, or they can be also specified on an active line separating them with space*
+- Use *BASH_ENV* variable witch in case of the bash shell will trigger first the script specified by the variable; see bellow example
+
+```
+   SHELL=/bin/bash
+   BASH_ENV=/etc/environment
+   * * * * * root echo "${CUSTOM_ENV_VAR}"
+```
+
+**Cron Jobs Output** would be the last hurdle we have to deal with in cronjobs.  
+A cronjob that doesn't have output redirected specifically somwhere might not send messages to STDOUT/STDERR,  
+because even is cron is running in the foreground, the output from its child processes is designed to go to a log file (traditionally at /var/log/cron)
+The way to deal with this is to use a specific redirection in your crontabs
+
+```
+# >/proc/1/fd/1 redirects STDOUT from the `date` command to PID1's STDOUT
+# 2>/proc/1/fd/2 redirects STDERR from the `date` command to PID1's STDERR
+
+* * * * * root date >/proc/1/fd/1 2>/proc/1/fd/2
+```
+To explain a bit the above example, the date script redirect its STDERR and STDOUT to the file descriptors 1 and 2 of the process with PID 1,  
+and the PID 1 process is our cron. It might be the init process of the container if we use that (tini for example).
+
+
 
 ## Docker logging
 
