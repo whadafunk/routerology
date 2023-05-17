@@ -54,6 +54,45 @@ These commands are:
 - There is a feature that maps the root in the container to a normal user in the host
 - There is another way which you can run a process inside the container as non-root. And that is by the way of su
 - Regarding the last option it can be controlled in an init script with env variables
+- There are containers that are built with a specific USER in their *Dockerfile*, like for example the php based on debian,  
+which runs with USER 33, which on most systems is www-data, the default apache user.
+
+## Docker Timezone
+
+On most containers, and especially Debian timezone is handled by the tzdata package which uses the value from */etc/timzone*,  
+to configure the time zone. 
+In order to reconfigure timezone, you need to change the value from */etc/timezone* and then run *dpkg-reconfigure tzdata*.  
+That the above action does is to recreate the symbolic link under */etc/localtime* to point to the corect timezone database.  
+
+With containers the easiest way to configure timezone is to use the *TZ* environment variable, but you still need the tzdata package.  
+
+```
+FROM ubuntu:latest
+ENV TZ=Europe/London
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y tzdata
+```
+
+If you prefer you can set the *TZ* environment variable when you start the container
+
+```
+docker run -e TZ=Europe/London -it ubuntu:latest
+```
+
+If you prefer to write a custom */etc/timezone* inside the container then you also need to run *dpkg-reconfigure tzdata*  
+
+```
+FROM ubuntu:latest
+RUN echo "Europe/London" > /etc/timezone
+RUN dpkg-reconfigure -f noninteractive tzdata
+```
+
+One last method is to mount the local *timezone* and *localdata* files, and this way to sync with the timezone of the docker host.  
+
+```
+docker run -v /etc/timezone:/etc/timezone -v /etc/localtime:/etc/localtime -it ubuntu:latest
+```
+
 
 ## Docker init system
 

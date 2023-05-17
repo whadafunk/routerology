@@ -1,0 +1,52 @@
+# BASH TIPS AND TRICKS
+
+Bash can be started in multiple modes:
+
+### Interactive login shell
+
+This is the mode when bash is started by the /bin/login or some other binary invoked at login
+In this mode it will run /etc/profile and user related ~/.bash_profile
+
+### Interactive non-login shell
+
+This is the mode when bash is started at the cli from other shell like bash, zsh or ksh
+When started in this mode it will run /etc/bashrc and ~/.bashrc. Additionally it will copy
+all the environment variables from the parent shell
+
+
+
+### Non-Interactive non-login shell
+
+This is for the bash scripts. It doesn't trigger any script, and it inherits the environment variables
+of the parent shell.
+
+
+## System Wide Shell Startup Files
+
+
+**/etc/profile** and **/etc/profile.d**
+
+The /etc/profile file – it stores system-wide environment configurations and startup programs for login setup. All configurations that you want to apply to all system users’ environments should be added in this file.
+
+
+**/etc/bashrc or /etc/bash.bashrc**
+contains system-wide functions and aliases including other configurations that apply to all system users.
+
+
+
+## Exporting variables
+
+Normally, when you start a child shell, you will inherit all the environment variables from the parent.
+When you create a bash variable with *my_var=myvalue*, is said that you created a local variable,  
+and what that really means is that you won't see that variable in child shell processes.
+In order to have the variable in child processes you need to export it.  
+Like this: *export my_var=myvalue*
+
+## Sourcing variables
+
+There is a way to start a child shell, but all the variables created in that child to be actually created in the parent. 
+You will do this by starting the subshell with source or the character "."  
+The source command reads and executes commands from the file specified as its argument in the current shell environment.  
+It is useful toload functions, variables, and configuration files into shell scripts. 
+
+
