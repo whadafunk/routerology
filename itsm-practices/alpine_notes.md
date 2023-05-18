@@ -29,6 +29,8 @@ The following is a list with a couple of these packages that are usualy needed
 
 #### *Base*
 
+- **gcc and make** - if you will need to build the tools package you'll also need these two
+- **linux-headers** - also needed for local builds
 - **open-vm-tools** / **virtualbox-guest-additions** / **qemu-guest-agent** / **xe-guest** - if you are on a virtualmachine 
 - **shadow package** - includes: useradd, groupadd, usermod, chsh
 - **bash** - if you are not happy with busybox which is the default
@@ -36,6 +38,13 @@ The following is a list with a couple of these packages that are usualy needed
 - **sudo** - the well known sudo package
 - **vim**, **nano**, or **joe** - whichever you prefer
 - **man-pages** - alpine does not come preinstalled with the man viewer nor the documentation pages
+- **curl and wget**
+
+- **create generic admin account**
+- **update-ca-certificates**
+- **copy ssh pub keys**
+- **add admin account to groups: sudo, vboxsf, root, etc**
+- **create the /var/log/admin files**
 
 #### *Above base*
 
@@ -43,7 +52,7 @@ The following is a list with a couple of these packages that are usualy needed
 - **git**
 - **gpg**
 - **wget** and **curl**
-- **dig** , **nslookup**
+- **dig** , **bind9-utils**, **nslookup**
 - **openssh**
 - **figlet**
 
@@ -51,6 +60,7 @@ The following is a list with a couple of these packages that are usualy needed
 
 - **net-tools**, **nmap**, **tcpdump**, **ngrep**, **nc / netcat**, **hping**
 - **iproute2**; by default this functionality comes from busybox
+- **openvpn3**
 
 #### *Security*
 
