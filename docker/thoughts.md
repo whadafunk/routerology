@@ -43,6 +43,14 @@ These commands are:
 - Exposed Ports
 - Volume
 
+## CONTAINER STDIN STDOUT
+
+An important thing with docker is that there needs to be at lease one process running in the foreground in the container.  
+A good example would be when you try to run a simple alpine container without --interactive/-i flag.
+As you will see the container will exit because the alpine default cmd is /bin/sh which will exit if not attached to a terminal.  
+So the container will stay up as long as it has a running process inside.
+
+
 
 ## User and Group IDs
 
@@ -62,7 +70,7 @@ which runs with USER 33, which on most systems is www-data, the default apache u
 On most containers, and especially Debian timezone is handled by the tzdata package which uses the value from */etc/timzone*,  
 to configure the time zone. 
 In order to reconfigure timezone, you need to change the value from */etc/timezone* and then run *dpkg-reconfigure tzdata*.  
-That the above action does is to recreate the symbolic link under */etc/localtime* to point to the corect timezone database.  
+What the above action does is to recreate the symbolic link under */etc/localtime* to point to the corect timezone database.  
 
 With containers the easiest way to configure timezone is to use the *TZ* environment variable, but you still need the tzdata package.  
 
@@ -154,7 +162,7 @@ exec "cron -f"
 ```
 
 - Set the variables one by one in the crontabs *this can be don apriori to the active lines, with multiple distinct lines, each with one variable, or they can be also specified on an active line separating them with space*
-- Use *BASH_ENV* variable witch in case of the bash shell will trigger first the script specified by the variable; see bellow example
+- Use *BASH_ENV* variable wich in case of the bash shell will trigger first the script specified by the variable; see bellow example
 
 ```
    SHELL=/bin/bash

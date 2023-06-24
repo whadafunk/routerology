@@ -1,0 +1,57 @@
+
+
+File descriptor 1 is the standard output (stdout).
+File descriptor 2 is the standard error (stderr).
+
+At first, 2>1 may look like a good way to redirect stderr to stdout. However, it will actually be interpreted as "redirect stderr to a file named 1".
+
+& indicates that what follows and precedes is a file descriptor, and not a filename. Thus, we use 2>&1. Consider >& to be a redirect merger operator.
+
+
+ redirect stdout to file.txt:
+
+echo test > file.txt
+
+This is equivalent to:
+
+echo test 1> file.txt
+
+To redirect stderr to file.txt:
+
+echo test 2> file.txt
+
+So >& is the syntax to redirect a stream to another file descriptor:
+
+    0 is stdin
+    1 is stdout
+    2 is stderr
+
+To redirect stdout to stderr:
+
+echo test 1>&2   # equivalently, echo test >&2
+
+To redirect stderr to stdout:
+
+echo test 2>&1
+
+Thus, in 2>&1:
+
+    2> redirects stderr to an (unspecified) file.
+    &1 redirects stderr to stdout.
+
+4 - Last trick and more...
+
+For redirecting both output from a given command, we see that a right syntax could be:
+
+$ ls -ld /tmp /tnt >/dev/null 2>&1
+
+for this special case, there is a shortcut syntax: &> ... or >&
+
+$ ls -ld /tmp /tnt &>/dev/null
+
+$ ls -ld /tmp /tnt >&/dev/null
+
+Nota: if 2>&1 exist, 1>&2 is a correct syntax too:
+
+$ ls -ld /tmp /tnt 2>/dev/null 1>&2
+

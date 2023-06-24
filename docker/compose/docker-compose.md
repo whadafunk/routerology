@@ -8,6 +8,9 @@
 
 ### Docker Compose is like a playbook with instruction on how to deploy container infrastructure 
 
+```
+The Compose file is a YAML file defining *version* (DEPRECATED), *services* (REQUIRED), *networks*, *volumes*, *configs* and *secrets*. The default path for a Compose file is *compose.yaml* (preferred) or *compose.yml* in working directory. Compose implementations SHOULD also support *docker-compose.yaml* and *docker-compose.yml* for backward compatibility. If both files exist, Compose implementations MUST prefer canonical compose.yaml one.
+```
 *docker-compose.yml* - this is the original name of the playbook file and it looks something like this
 
 
@@ -24,9 +27,11 @@
 >    command:  
 > volumes:  
 > networks:  
+> configs:
+> secrets:
 
 
-**Dashes represent Lists.**
+**Dashes represent Lists in YAML**
 
 *All members of a list are lines beginning at the same indentation level starting with a -*
 
@@ -45,6 +50,10 @@ martin:
   job: Developer  
   skill: Elite  
 
+There are cases in compose file when you can use both list or a dictionary collection for a specific object.  
+Environment is a good such example, but lists seem to be more suited for single values, and not for key:value pairs. 
+Like for example with networks, or volumes, devices, dns, dns-search, extra-hosts, ports, expose
+
 ### The following two constructs are the same
 
 environment:  
@@ -59,6 +68,21 @@ environment:
  \- SHOW=true  
  \- SESSION_SECRET  
 
+*The list version in this case is not adding clarity or simplify things*
+
+## Docker compose networking
+
+>By default Compose sets up a single network for your app. Each container for a service joins the default network 
+>and is both reachable by other containers on that network, and discoverable by them at a hostname identical to the container name.
+>Your app’s network is given a name based on the *“project name”*, which is based on the name of the directory it lives in. 
+>You can override the project name with either the *--project-name* flag or the *COMPOSE_PROJECT_NAME* environment variable.
+
+Is best to use the *name:* element for the networks defined in compose.yaml, because if you don't the network name will be  
+prefixed by the project's name.
+In case of external networks, I think you can get away without using the *name:* elements, and docker will try to find a name 
+that matches the network itself, but if you want to be sure you can use the *name:*. Also *name:* allows you to use 
+an environment variable as value. Ex: *name: "${NETWORK_ID}"*
+
 ## Here are the details of the docker-compose file syntax
 
 **build:** /path/to/Dockerfile  
@@ -67,8 +91,8 @@ environment:
   com.example.description: "Something Fishy"  
 **labels:**  
   \- "com.example.description=something fishy"  
-**network:** bridge  
-**network:** none  
+**networks:** bridge  
+**networks:** none  
 **command:** echo "hello world"  
 **command:** ["echo","hello world"]  
 **container_name:** my_fancy_container  

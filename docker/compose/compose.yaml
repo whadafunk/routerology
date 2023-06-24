@@ -1,0 +1,61 @@
+# Docker Compose Example
+
+
+services:
+  serv1:
+    image: routerology/alpine_base:latest
+    hostname: myhello
+    container_name: serv_1
+    stdin_open: true
+    tty: true
+    environment:
+      var1: "quick brown fox"
+      var2: "pula mea"
+    networks:
+      c_net1:
+        aliases:
+          - cnex
+          - cney
+        priority: 0
+      c_net2:
+        ipv4_address: 172.13.14.15
+        priority: 100 
+
+
+networks:
+  c_net1:
+    driver: bridge
+    name: c_net1
+    attachable: true
+    driver_opts:
+      com.docker.network.bridge.name: c_net_br0
+      com.docker.network.driver.mtu: 1501
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.12.14.0/24
+          gateway: 172.12.14.1
+          ip_range: 172.12.14.0/25
+          aux_addresses:
+            host1: 172.12.14.11
+            host2: 172.12.14.12
+  c_net2:
+    driver: macvlan
+    name: c_net2
+    driver_opts:
+      parent: enp0s3
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.13.14.0/24
+          gateway: 172.13.14.1
+          ip_range: 172.13.14.128/25
+          aux_addresses:
+            host1: 172.13.14.11
+        
+
+
+
+
+
+
