@@ -123,6 +123,16 @@ This way, whatever you specified in ENTRYPOINT or CMD is passed as argument to /
 >Is recomended to use --init whenever you have a container with more than one process
 >A common use-case for me is when I need cron jobs to run in the same container
 
+**Why there is a practice to use wait in the entrypoint scripts for multiple processes containers and init owned processes**
+
+We know that a container has to have at least one running process in foreground, otherways it will exit.
+With multiple processes there might be the case that you spawn your processes in background and the container will exit.
+So the workarround is to have a *wait* command at the end of the initialization script, that will keep the script from finishing,  
+because it will not finish until all the  background processes / or just one of them, will exit. 
+
+If the entrypoint.sh script was started with --init / tini, all the spawned processes will have PID 1 as parent ID, and at least  
+SIGTERM signaling will work allright.
+
 
 ## Docker and Cron
 

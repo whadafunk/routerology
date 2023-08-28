@@ -65,6 +65,11 @@ The important things in the configuration file are:
 - Base DN and filters  
 - mapping rules for mapping linux fields from passwd, group, shadow to ldap fields in active directory  
 
+Pay attention to the mappings for uid and gid for both passwd and shadow. For this you need to find  the SID prefix of your directory.
+
+Also pay atention to the nscd service which is a caching service for ldap credentials. You might need to restart it after changes.
+
+
 If you missed the initial configuration wizard of libnss-ldapd, where you can add ldap authentication to passwd, group and shadow databases  
 just run *dpkg-reconfigure libnss-ldapd*, and you'll have it, but you can also just edit */etc/nsswitch.conf*
 
