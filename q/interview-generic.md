@@ -7,6 +7,7 @@
     3. What you like and what you don't like about one of the vendors: Cisco, FortiNet, Checkpoint, PaloAlto
     4. Tell something about your technical certifications: some challenge, a personal experience, what you think you gained
     5. Checkpoint, Forti, Palo Alto, F5, Q-Radar, ArcSight, SIEM
+    6. What is an Operating System
     7. How would you define a computer network
     8. Who is communicating actually in a computer network
     9. Describe how the ping command is working
