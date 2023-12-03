@@ -3,28 +3,31 @@
 Compose is a tool for defining and running multi-container Docker applications. 
 With Compose, you use a YAML file to configure your application's services.  
 Then, with a single command, you create and start all the services from your configuration.
+The docker Compose is like a playbook with instruction on how to deploy container infrastructure 
 
 ### Installation
 
->  sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose  
->  sudo chmod +x /usr/local/bin/docker-compose  
->  docker-compose --version  
+```
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose  
+sudo chmod +x /usr/local/bin/docker-compose  
+docker-compose --version  
+```
 
 Nowadays, compose has been included as a docker subcommand, so it will be available with any docker installation.
 
-### Docker Compose is like a playbook with instruction on how to deploy container infrastructure 
 
-```
+
 The Compose file is a YAML file defining *version* (DEPRECATED), *services* (REQUIRED), *networks*, *volumes*, *configs* and *secrets*.  
 The default path for a Compose file is *compose.yaml* (preferred) or *compose.yml* in working directory.  
 Compose implementations SHOULD also support *docker-compose.yaml* and *docker-compose.yml* for backward compatibility.  
 If both files exist, Compose implementations MUST prefer canonical compose.yaml one.
-```
+
+
 *docker-compose.yml* - this is the legacy name of the playbook file and it looks something like this:
 
 
->version: "3.8"  
->services:  
+> version: "3.8"  
+> **services:**  
 >  servicename1:  
 >    build:  
 >    image:  
@@ -34,10 +37,10 @@ If both files exist, Compose implementations MUST prefer canonical compose.yaml 
 >    volumes:  
 >    ports:  
 >    command:  
-> volumes:  
-> networks:  
-> configs:
-> secrets:
+> **volumes:**  
+> **networks:**  
+> **configs:**
+> **secrets:**
 
 
 **Dashes represent Lists in YAML**
@@ -81,16 +84,18 @@ environment:
 
 ## Docker compose networking
 
->By default Compose sets up a single network for your app. Each container for a service joins the default network 
->and is both reachable by other containers on that network, and discoverable by them at a hostname identical to the container name.
->Your app’s network is given a name based on the *“project name”*, which is based on the name of the directory it lives in. 
->You can override the project name with either the *--project-name* flag or the *COMPOSE_PROJECT_NAME* environment variable.
+By default Compose sets up a single network for your app.  
+Each container for a service joins the default network 
+and is both reachable by other containers on that network, 
+and discoverable by them at a hostname identical to the container name.  
+Your app’s network is given a name based on the *“project name”*, 
+which is based on the name of the directory it lives in.   
+You can override the project name with either the *--project-name* flag 
+or the *COMPOSE_PROJECT_NAME* environment variable.
 
-Is best to use the *name:* element for the networks defined in compose.yaml, because if you don't the network name will be  
-prefixed by the project's name.
-In case of external networks, I think you can get away without using the *name:* elements, and docker will try to find a name 
-that matches the network itself, but if you want to be sure you can use the *name:*. Also *name:* allows you to use 
-an environment variable as value. Ex: *name: "${NETWORK_ID}"*
+Is best to use the *name:* element for the networks defined in compose.yaml, because if you don't the network name will bei prefixed by the project's name.   
+In case of external networks, I think you can get away without using the *name:* elements, and docker will try to find a name that matches the network itself, but if you want to be sure you can use the *name:*.   
+Also *name:* allows you to us ean environment variable as value. Ex: *name: "${NETWORK_ID}"*
 
 ### Top-Level Networks Example
 
@@ -129,25 +134,27 @@ Here are a couple of driver options from the implicit bridge network:
 
 ## Docker compose volumes
 
-Volumes define mount host paths or named volumes that are accessible by service containers. You can use volumes to define multiple types of mounts; volume, bind, tmpfs, or npipe.  
+Volumes define mount host paths or named volumes that are accessible by service containers.  
+You can use volumes to define multiple types of mounts; volume, bind, tmpfs, or npipe.  
 If the mount is a host path and is only used by a single service, it can be declared as part of the service definition. 
 To reuse a volume across multiple services, a named volume must be declared in the top-level volumes key.
 
 There is a short and a long syntax for using volumes under services in docker compose:
 
-### The short syntax, 
+### The short syntax 
 
 uses a single string with colon-separated values to specify a volume mount 
 
-> (VOLUME:CONTAINER_PATH), 
-> or an access mode (VOLUME:CONTAINER_PATH:ACCESS_MODE).
+        (VOLUME:CONTAINER_PATH), 
+        or an access mode (VOLUME:CONTAINER_PATH:ACCESS_MODE).
 
 **ACCESS_MODE:** A comma-separated , list of options:
 
    *  rw: Read and write access. This is the default if none is specified.
    *  ro: Read-only access.
 
-### The long syntax,
+### The long syntax
+
 The long form syntax allows the configuration of additional fields that can't be expressed in the short form
 
 * type: The mount type. Either volume, bind, tmpfs, npipe, or cluster
@@ -162,15 +169,15 @@ The long form syntax allows the configuration of additional fields that can't be
 
 See the follwing examples and try to figure it out
 
-**volumes:**  
- \- [src]:target:[mode]  
- \- /opt/data:/var/lib/mysql:rw  
+         **volumes:**  
+         - [src]:target:[mode]  
+         - /opt/data:/var/lib/mysql:rw  
 
-**volumes:** 
- \- type: volume  
-   source: mydata  
-   target: /data  
-   read_only:   
+        **volumes:** 
+         - type: volume  
+           source: mydata  
+           target: /data  
+           read_only:   
 
 
 ## Here are the details of the docker-compose file syntax
@@ -190,9 +197,12 @@ See the follwing examples and try to figure it out
    \-db  
    \-redis  
 
->docker-compose up starts services in dependency order. In the following example, db and redis are started before web.  
->docker-compose up SERVICE automatically includes SERVICE’s dependencies. In the example below, docker-compose up web also creates and starts db and redis.  
->docker-compose stop stops services in dependency order. In the following example, web is stopped before db and redis.
+**docker-compose up** starts services in dependency order.  
+In the following example, db and redis are started before web.  
+**docker-compose up SERVICE** automatically includes SERVICE’s dependencies.  
+In the example below, docker-compose up web also creates and starts db and redis.  
+**docker-compose stop** stops services in dependency order.   
+In the following example, web is stopped before db and redis.
 
 
 **restart_policy:** -> this is a new stanza that replaces restart 
@@ -263,28 +273,28 @@ ipv4_address: 1.2.3.4 -> this option should be placed inside a network section
 
 ## Top Level Networks Object
 
-**networks:**  
- net_name:  
-	external: true  
-	name: actual_name_of_the_network  
+        **networks:**  
+         net_name:  
+        	external: true  
+        	name: actual_name_of_the_network  
 
- net_name:  
-	driver: bridge | macvlan | ipvlan | host | none  
-	driver_opts:  
-		foo: "bar"  
-		baz: 1  
-	attachable: true  
-	ipam:  
-	driver: default  
-	config:  
-	- subnet: 192.168.1.0/24  
-	gateway: 192.168.1.1 -> this is only supported in version 2 
+         net_name:  
+        	driver: bridge | macvlan | ipvlan | host | none  
+        	driver_opts:  
+        		foo: "bar"  
+        		baz: 1  
+        	attachable: true  
+        	ipam:  
+        	driver: default  
+        	config:  
+        	- subnet: 192.168.1.0/24  
+        	gateway: 192.168.1.1 -> *this is only supported in version 2* 
 
 *You can define a default network like this*
-networks:  
-  default:  
-    external:  
-      name: my-pre-existing-network
+        networks:  
+          default:  
+            external:  
+              name: my-pre-existing-network
 
 
 ## Top Level Volumes Object
@@ -302,68 +312,27 @@ The volumes attribute has additional syntax that provides more granular control.
          device: ":/docker/example"
 
 ### Here is an example for a smb/cifs volume
- nas-share: \
-    driver_opts: \
-      type: cifs \
-      o: "username=[username],password=[password]" \
-      device: "//my-nas/share"
+         nas-share: \
+            driver_opts: \
+              type: cifs \
+              o: "username=[username],password=[password]" \
+              device: "//my-nas/share"
 
 ### Here is an example for a local bind volume
 
-a_volume: \
-    driver: local \
-    driver_opts: \
-      type: none \
-      o: bind \
-      device: "/opt/volumes/a_volume" \
-    name: "a_volume" '
+        a_volume: \
+            driver: local \
+            driver_opts: \
+              type: none \
+              o: bind \
+              device: "/opt/volumes/a_volume" \
+            name: "a_volume" '
 
 ### If you just want to create just a named volume, do not specify anything else than name:
 
-named_volume:
-    name: my_named_volume
+        named_volume:
+            name: my_named_volume
 
 
 *The interesting thing to note here is that there are multiple types supported with local driver:
  none, cifs, nfs, tmpfs, btrfs)*
-
-docker volume create --driver local \
-    --opt type=tmpfs \
-    --opt device=tmpfs \
-    --opt o=size=100m,uid=1000 \
-    foo
-
-docker volume create --driver local \
-    --opt type=btrfs \
-    --opt device=/dev/sda2 \
-    foo
-
-
-docker volume create --driver local \
-    --opt type=nfs \
-    --opt o=addr=192.168.1.1,rw \
-    --opt device=:/path/to/dir \
-    foo
-
-docker volume create --driver local \
-    --opt type=none \
-    --opt device=/var/opt/my_website/dist \
-    --opt o=bind web_data
-
-docker volume create \
-    --driver local \
-    --opt type=nfs \
-    --opt o="vers=4,addr=<IP of NAS>,rw" \
-    --opt device=:<Path on NAS> \
-    v_portainer
-
-and
-
-docker volume create \
-    --driver local \
-    --opt type=cifs \
-    --opt o=addr=<IP of NAS>,rw \
-    --opt device=//<IP of NAS>/<Share on NAS> \
-    --opt o=uid=0,username=<smbuser>,password=<smbpassword>,nounix,file_mode=0770,dir_mode=0770 \
-    v_portainer
-

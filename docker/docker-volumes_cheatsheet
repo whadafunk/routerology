@@ -1,0 +1,40 @@
+docker volume create --driver local \
+    --opt type=tmpfs \
+    --opt device=tmpfs \
+    --opt o=size=100m,uid=1000 \
+    foo
+
+docker volume create --driver local \
+    --opt type=btrfs \
+    --opt device=/dev/sda2 \
+    foo
+
+
+docker volume create --driver local \
+    --opt type=nfs \
+    --opt o=addr=192.168.1.1,rw \
+    --opt device=:/path/to/dir \
+    foo
+
+docker volume create --driver local \
+    --opt type=none \
+    --opt device=/var/opt/my_website/dist \
+    --opt o=bind web_data
+
+docker volume create \
+    --driver local \
+    --opt type=nfs \
+    --opt o="vers=4,addr=<IP of NAS>,rw" \
+    --opt device=:<Path on NAS> \
+    v_portainer
+
+and
+
+docker volume create \
+    --driver local \
+    --opt type=cifs \
+    --opt o=addr=<IP of NAS>,rw \
+    --opt device=//<IP of NAS>/<Share on NAS> \
+    --opt o=uid=0,username=<smbuser>,password=<smbpassword>,nounix,file_mode=0770,dir_mode=0770 \
+    v_portainer
+

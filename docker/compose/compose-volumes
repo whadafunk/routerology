@@ -1,0 +1,24 @@
+volumes:
+	nas-share:
+		name: nas_share
+       	 	driver_opts:
+       	   		type: cifs
+       	   		o: "username=[username],password=[password]"
+       	   		device: "//my-nas/share"
+	a_volume:
+       		name: a_volume 
+		driver: local
+       	 	driver_opts:
+       	   		type: none
+       	   		o: bind
+       	   		device: "/opt/volumes/a_volume"
+
+	nfs_vol:
+		name: nfs_vol
+		driver: local
+		driver_opts:
+			type=nfs
+			o: "vers=4,addr=192.168.1.10,rw"
+			device: /nfs_export"
+	named_volume:
+       		 name: my_named_volume
