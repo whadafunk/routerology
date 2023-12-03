@@ -94,29 +94,29 @@ an environment variable as value. Ex: *name: "${NETWORK_ID}"*
 
 ### Top-Level Networks Example
 
-networks:
-  default:
-    external: true
-    name: bridge
-  macnet1:
-    driver: macvlan
-    driver_opts:
-      parent: enp0s8
-      macvlan_mode: bridge
-      ipvlan_mode: l2 | l3
-    attachable: true
-    ipam:
-      driver: default
-      config:
-       - subnet: 192.168.1.0/24
-         ip_range: 192.168.1.128/25
-         gateway: 192.168.1.1
-         aux_addresses:
-           host1: 192.168.1.10
-           host2: 192.168.1.11
-  hostnet:
-    external: true
-    name: host
+    networks:
+      default:
+        external: true
+        name: bridge
+      macnet1:
+        driver: macvlan
+        driver_opts:
+          parent: enp0s8
+          macvlan_mode: bridge
+          ipvlan_mode: l2 | l3
+        attachable: true
+        ipam:
+          driver: default
+          config:
+           - subnet: 192.168.1.0/24
+             ip_range: 192.168.1.128/25
+             gateway: 192.168.1.1
+             aux_addresses:
+               host1: 192.168.1.10
+               host2: 192.168.1.11
+      hostnet:
+        external: true
+        name: host
 
 Here are a couple of driver options from the implicit bridge network:
 
