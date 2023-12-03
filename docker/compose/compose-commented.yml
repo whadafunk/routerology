@@ -1,4 +1,4 @@
-# Docker Compose File Template
+# Docker Compose File Template With Coments
 # If we are using compose.yaml or compose.yml there is no need for the version
 # You should use docker-compose config to check the compose file
 
@@ -16,6 +16,7 @@ services:
     build: .
     init: true
 # container_name doesn't work with scale
+    hostname: foo
     container_name: my_apache
     labels:
       - "maintainer=gri.daniel@gmail.com"
@@ -26,7 +27,7 @@ services:
     environment:
       - "var1=val1"
       - "var2=val2"
-#   network_mode: "host" | "none" | "service"
+# network_mode: "host" | "none" | "service"
 # If you don't specify any other settings for networking, a list with network names can be enough
     networks:
       - default
@@ -41,8 +42,22 @@ services:
 #         -who
 #         -two
 #       priority: 100
+# aliases declares alternative hostnames for the service on the network. 
+# Other containers on the same network can use either the service name or an alias 
+# to connect to one of the service's containers.
+#
+# Docker Compose default network.
+# If we do not define a specific network, compose sets up a single default network that each container will join.
+# This default network is given a name based on the project's name which in turn is based on the 
+# name of the directory it lives in. 
+# The name of the project can be overriden with --project-name runtime directive or with the
+# COMPOSE_PROJECT_NAME environment variable
 
-# These ports MUST be accessible to linked services and SHOULD NOT be published to the host machine.
+
+
+# If you're not clear about the difference between ports and expose in compose here's a quick overview:
+# Expose ports without publishing them to the host machine - they’ll only be accessible to linked services.
+# Only the internal port can be specified.
     expose:
       - "3000"
     ports:
@@ -56,7 +71,6 @@ services:
       - domain1.com
       - domain2.com
     domainname: foo.com
-    hostname: foo
 # Add these extra hosts to container /etc/hosts
     extra_hosts:
       - "somehost:1.2.3.4"
@@ -79,9 +93,9 @@ services:
       - nothing
     restart: always
     entrypoint: 
-      -php
-      -d
-      -/bin/stuff.php
+      - php
+      - d
+      - /bin/stuff.php
     command: apachectl -k start
     command: ["/usr/local/bin/httpd","-DFOREGROUND"]
     command: null

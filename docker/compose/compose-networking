@@ -1,0 +1,37 @@
+# Everything under this section is about defining networks      
+# Use this snippets to figure out how to configure custom networking in docker compose
+
+networks:
+  default:
+    external: true
+    name: bridge
+  macnet1:
+    driver: macvlan
+    driver_opts:
+      parent: enp0s8
+      macvlan_mode: bridge
+      ipvlan_mode: l2 | l3
+    attachable: true
+    ipam:
+      driver: default
+      config:
+       - subnet: 192.168.1.0/24
+         ip_range: 192.168.1.128/25
+         gateway: 192.168.1.1
+         aux_addresses:
+           host1: 192.168.1.10
+           host2: 192.168.1.11
+  hostnet:
+    external: true
+    name: host
+
+
+# Here are a couple of driver options from the implicit bridge network:
+
+            "com.docker.network.bridge.enable_icc": "true",
+            "com.docker.network.bridge.enable_ip_masquerade": "true",
+            "com.docker.network.bridge.host_binding_ipv4": "0.0.0.0",
+            "com.docker.network.bridge.name": "docker0",
+            "com.docker.network.driver.mtu": "1500"
+
+
