@@ -21,5 +21,6 @@ For example, for apache based image the UID/GID is 33 which corresponds with www
 - certificates
 - data
 - profiles
+- logs
 
 ## Use shell mode for RUN and exec mode for ENTRYPOINT and CMD

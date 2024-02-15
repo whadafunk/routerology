@@ -93,7 +93,7 @@ which is based on the name of the directory it lives in.
 You can override the project name with either the *--project-name* flag 
 or the *COMPOSE_PROJECT_NAME* environment variable.
 
-Is best to use the *name:* element for the networks defined in compose.yaml, because if you don't the network name will bei prefixed by the project's name.   
+Is best to use the *name:* element for the networks defined in compose.yaml, because if you don't the network name will be prefixed by the project's name.   
 In case of external networks, I think you can get away without using the *name:* elements, and docker will try to find a name that matches the network itself, but if you want to be sure you can use the *name:*.   
 Also *name:* allows you to us ean environment variable as value. Ex: *name: "${NETWORK_ID}"*
 
@@ -157,7 +157,7 @@ uses a single string with colon-separated values to specify a volume mount
 
 The long form syntax allows the configuration of additional fields that can't be expressed in the short form
 
-* type: The mount type. Either volume, bind, tmpfs, npipe, or cluster
+* type: The mount type. Either volume, bind, tmpfs, npipe, or cluster. the volume type under services differ from what you use under top level volumes
 * source: The source of the mount, a path on the host for a bind mount, or the name of a volume defined in the top-level volumes key. Not applicable for a tmpfs mount.
 * target: The path in the container where the volume is mounted.
 * read_only: Flag to set the volume as read-only.
@@ -174,7 +174,7 @@ See the follwing examples and try to figure it out
          - /opt/data:/var/lib/mysql:rw  
 
         **volumes:** 
-         - type: volume  
+         - type: volume | bind 
            source: mydata  
            target: /data  
            read_only:   

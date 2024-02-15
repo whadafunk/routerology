@@ -1,3 +1,19 @@
+services:
+	alpine_base:
+		container_name: alpine_base
+		image: routerology/alpine_base
+		volumes:
+			- type: volume
+			  source: a_volume
+			  target: /root/a_volume
+			- type: volume
+			  source: named_volume
+			  target: /root/named_vol
+			- type: bind
+			  source: ./to-be-mounted
+			  target: /root/to-be-mounted
+			  read_only: false
+
 volumes:
 	nas-share:
 		name: nas_share

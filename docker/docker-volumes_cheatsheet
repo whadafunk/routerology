@@ -33,8 +33,18 @@ and
 docker volume create \
     --driver local \
     --opt type=cifs \
-    --opt o=addr=<IP of NAS>,rw \
     --opt device=//<IP of NAS>/<Share on NAS> \
     --opt o=uid=0,username=<smbuser>,password=<smbpassword>,nounix,file_mode=0770,dir_mode=0770 \
     v_portainer
 
+
+docker run \
+  --mount='type=volume,dst=/external-drive,volume-driver=local,volume-opt=device=/dev/loop5,volume-opt=type=ext4'
+
+
+docker volume create \
+	--driver local \
+	--opt type=volume \
+	--opt device=/dev/loop5 \
+	--opt o="type=ntfs" \
+	my_vol
