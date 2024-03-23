@@ -1,0 +1,7 @@
+ssh -L 8000:192.168.0.1:80 -okexalgorithms=+diffie-hellman-group1-sha1 -ohostkeyalgorithms=+ssh-rsa -ociphers=+aes128-cbc netadm@192.168.247.1
+
+
+
+KexAlgorithms
+HostKeyAlgorithms
+Ciphers
