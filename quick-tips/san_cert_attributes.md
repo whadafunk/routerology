@@ -3,6 +3,12 @@
 
 In the Attributes box, type the desired SAN attributes. 
 
+-DNS
+-IP
+-email
+-URI
+-RID
+
 ### SAN attributes take the following form:
 
 **san:dns=dns.name[&dns=dns.name]**
