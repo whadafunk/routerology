@@ -95,7 +95,7 @@ or the *COMPOSE_PROJECT_NAME* environment variable.
 
 Is best to use the *name:* element for the networks defined in compose.yaml, because if you don't the network name will be prefixed by the project's name.   
 In case of external networks, I think you can get away without using the *name:* elements, and docker will try to find a name that matches the network itself, but if you want to be sure you can use the *name:*.   
-Also *name:* allows you to us ean environment variable as value. Ex: *name: "${NETWORK_ID}"*
+Also *name:* allows you to use an environment variable as value. Ex: *name: "${NETWORK_ID}"*
 
 ### Top-Level Networks Example
 

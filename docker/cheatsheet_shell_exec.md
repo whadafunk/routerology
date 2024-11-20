@@ -33,9 +33,9 @@ CMD ["sleep", "1s"]
 
 ## Recommendations
 
-These are the recommended forms to use for each instruction:
+These are some recommended forms to use for each instruction type:
 
-- RUN: shell form, because of the shell features
+- RUN: shell form, because of the shell features needed to chain multiple commands, and line continuation also
 - ENTRYPOINT: exec form, because of the signal trapping
 - CMD: exec form, because of the signal trapping
 

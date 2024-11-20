@@ -1,0 +1,48 @@
+docker buildx create --name mybuilder --use
+docker buildx inspect --bootstrap
+
+
+docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 \
+  -t yourusername/multi-arch-demo:latest \
+  --push .
+
+
+
+# Create a parallel multi-platform builder
+docker buildx create --name mybuilder --use
+# Make "buildx" the default
+docker buildx install
+# Build for multiple platforms
+docker build --platform linux/amd64,linux/arm64 .
+
+
+
+
+
+
+---------------
+
+
+# AMD64
+$ docker build -t your-username/multiarch-example:manifest-amd64 --build-arg ARCH=amd64/ .
+$ docker push your-username/multiarch-example:manifest-amd64
+
+# ARM32V7
+$ docker build -t your-username/multiarch-example:manifest-arm32v7 --build-arg ARCH=arm32v7/ .
+$ docker push your-username/multiarch-example:manifest-arm32v7
+
+# ARM64V8
+$ docker build -t your-username/multiarch-example:manifest-arm64v8 --build-arg ARCH=arm64v8/ .
+$ docker push your-username/multiarch-example:manifest-arm64v8 
+
+
+$ docker manifest create \
+your-username/multiarch-example:manifest-latest \
+--amend your-username/multiarch-example:manifest-amd64 \
+--amend your-username/multiarch-example:manifest-arm32v7 \
+--amend your-username/multiarch-example:manifest-arm64v8 
+
+
+$ docker manifest push your-username/multiarch-example:manifest-latest
+
+If you now go to Docker Hub, you’ll be able to see the new tag referencing the image

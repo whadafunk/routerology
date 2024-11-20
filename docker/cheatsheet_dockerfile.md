@@ -4,7 +4,7 @@
 ### Dockerfile is an instructionset that is used to build a specific container
 ### Main commands of a Dockerfile are:
 
-- FROM
+- FROM [AS stage-name]
 - MAINTAINER
 - RUN
 - COPY
@@ -16,7 +16,7 @@
 - VOLUME
 - EXPOSE
 
-
+### SHELL vs JSON formats / SHELL vs Exec
 
 > Pay attention that many of the docker commands have shell and exec forms (RUN, ENTRYPOINT, CMD)
 > The exec form is the preferred form expecially for ENTRYPOINT
@@ -32,7 +32,8 @@
 
 ## Here are some details of the Dockerfile commands
 
-- **FROM**  -> *FROM alpine:latest*
+- **FROM**  -> *FROM alpine:latest*; You can have multiple FROM stanzas in your docker file for a multibuild process
+use --copy-from=build-stage *stage_name* to copy artifacts from previous build stages.
 - **MAINTAINER** -> *MAINTAINER gri.daniel@gmail.com*
 - **RUN** 
 	- *RUN echo "hello world"* -> this is the shell form
@@ -40,6 +41,7 @@
 	- Most of the times RUN is used to install apps with apt or dnf, and is used in the shell form -> *dnf -y install vim*
 - **COPY src dst** -> *COPY /home/user/docker/file /opt file* -> it will copy the file to the container /opt directory
 - **COPY --chown=user:group source destination**
+- **COPY --from=build-stage *build-name or number starting from 0*
 - **WORKDIR** -> sets the workdir for all the following RUN commands
 - **ENV** -> *ENV MYVAR=something*
 	- You can use quotes if the value has spaces -> *ENV MYVAR="Some string with spaces"*

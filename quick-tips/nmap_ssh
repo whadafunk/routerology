@@ -1,0 +1,1 @@
+nmap --script ssh2-enum-algos -sV -p 22 1.2.3.4

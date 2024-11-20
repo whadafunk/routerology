@@ -21,7 +21,7 @@ auto eth0
 
 allow-hotplug eth10
 
-# Interface configuration stanza
+# Static IP Interface configuration
 
 iface eth0 inet static
 	address 192.168.1.100
@@ -67,3 +67,11 @@ iface tun_alt inet static
 	up ip link set mtu 1500 dev tun_alt
 	up ip route add 10.0.0.0/24 dev tun_alt
 	post-down ip tunnel del tun_alt
+
+# Configuring a vlan interface
+
+auto eth0.5
+iface eth0.5 inet static
+    address 192.168.1.200
+    netmask 255.255.255.0
+    vlan-raw-device eth0

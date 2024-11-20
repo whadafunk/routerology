@@ -107,7 +107,7 @@ docker run -v /etc/timezone:/etc/timezone -v /etc/localtime:/etc/localtime -it u
 Starting with Docker 1.13, an initialization system based on tini has been implemented for Docker.
 
 ```
-Tini is a tiny and simplest init available for containers. It works by spawning a single child and waiting for it to exit while reaping the zombie processes as well as performing signal forwarding.
+Tini is a tiny and simple init system available for containers. It works by spawning a single child and waiting for it to exit while reaping the zombie processes as well as performing signal forwarding.
 ```
 
 Tini can be used in more than one way:
@@ -192,13 +192,13 @@ The way to deal with this is to use a specific redirection in your crontabs
 * * * * * root date >/proc/1/fd/1 2>/proc/1/fd/2
 ```
 To explain a bit the above example, the date script redirect its STDERR and STDOUT to the file descriptors 1 and 2 of the process with PID 1,  
-and the PID 1 process is our cron. It might be the init process of the container if we use that (tini for example).
+and the PID 1 process is the one who's logs are shown by docker container logs. It might be the init process of the container if we use that (tini for example).
 
 
 
 ## Docker logging
 
-Docker fetches the stdout and stderr streams and passes them to the logging drivers which in turn writes them to the desired location:
+Docker fetches the stdout and stderr streams, of PID 1 process and passes them to the logging drivers which in turn writes them to the desired location:
 	- log file
 	- log collector
 	- log management service

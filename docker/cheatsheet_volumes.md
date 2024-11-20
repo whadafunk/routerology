@@ -1,3 +1,24 @@
+# Docker Volumes CheatSheet
+
+
+Docker volumes can be created at runtime (with *docker container run --mount* or *docker container run -v*), 
+or they can be created apriory by using the command *docker volume create*
+
+Do not confuse volumes with bind mounts, which can only be created at runtime.
+
+In most cases when you create a volume you need to specify a source and destination, and the driver is implied 
+to be *local*, which is the default if not specified otherwise.
+In advanced uses, you will also specify the driver and driver options.
+For the driver options, most common used are type and device, where device reads something as source of the data
+Depending on the type, there is another option which is used to specify suboptions specific to that type.
+Suboptions examples:
+- for nfs a suboption would be the ip address of the service, and rw/ro flags
+- for a cifs type, we have user/password and uid suboptions
+
+
+
+
+
 docker volume create --driver local \
     --opt type=tmpfs \
     --opt device=tmpfs \
