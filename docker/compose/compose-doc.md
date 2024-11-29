@@ -1,11 +1,12 @@
-# Docker Compose Quick Overview
+# Docker Compose Overview
 
 Compose is a tool for defining and running multi-container Docker applications. 
-With Compose, you use a YAML file to configure your application's services.  
+It is basically a process that controls the starting and stopping of containers and their resources, based of a configuration file.
+With Compose, you use a YAML configuration file which is called compose.yaml  
 Then, with a single command, you create and start all the services from your configuration.
 The docker Compose is like a playbook with instruction on how to deploy container infrastructure 
 
-### Installation
+### Docker Compose Installation
 
 ```
 sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose  
@@ -22,9 +23,13 @@ The default path for a Compose file is *compose.yaml* (preferred) or *compose.ym
 Compose implementations SHOULD also support *docker-compose.yaml* and *docker-compose.yml* for backward compatibility.  
 If both files exist, Compose implementations MUST prefer canonical compose.yaml one.
 
+Enlisting all the commands and parameters from compose.yaml, is not in the scope of this document, and is recommended that you
+Open the docker compose reference in a separate window when writing such compose config files.
+
+[“Docker Compose Reference”](https://docs.docker.com/reference/compose-file/)
+
 
 *docker-compose.yml* - this is the legacy name of the playbook file and it looks something like this:
-
 
 > version: "3.8"  
 > **services:**  
@@ -42,6 +47,43 @@ If both files exist, Compose implementations MUST prefer canonical compose.yaml 
 > **configs:**
 > **secrets:**
 
+### Docker compose commands and runtime parameters
+
+**docker-compose up** starts services in dependency order.  
+In the following example, db and redis are started before web.  
+**docker-compose up SERVICE** automatically includes SERVICE’s dependencies.  
+In the example below, docker-compose up web also creates and starts db and redis.  
+**docker-compose stop** stops services in dependency order.   
+In the following example, web is stopped before db and redis.
+
+docker compose config
+docker compose build [SERVICE]
+docker compose images
+docker compose exec
+docker compose logs
+docker compose ls
+docker compose ps
+docker compose restart
+docker compose up
+ --detach -d
+ --scale
+ --file -f
+ --project-name -p
+
+
+
+### Docker compose project name
+
+Every docker compose.yaml file is associated with a project name which by default gets the name of the folder in which the compose.yaml resides. 
+If you want you can control the name of the compose project using these methods:
+
+- Command Line runtime param —project-name
+- Environment Variable COMPOSE_PROJECT_NAME
+- Top Level stanza in the compose.yaml. name:
+
+The name of the project is prefixed to all network names created by compose, if you don’t specify a network name
+
+### Yaml Specifics
 
 **Dashes represent Lists in YAML**
 
@@ -82,6 +124,79 @@ environment:
 
 *The list version in this case is not adding clarity or simplify things*
 
+
+
+
+### Top Level Networks Object
+
+        **networks:**  
+         net_name:  
+        	external: true  
+        	name: actual_name_of_the_network  
+
+         net_name:  
+        	driver: bridge | macvlan | ipvlan | host | none  
+        	driver_opts:  
+        		foo: "bar"  
+        		baz: 1  
+        	attachable: true  
+        	ipam:  
+        	driver: default  
+        	config:  
+        	- subnet: 192.168.1.0/24  
+        	gateway: 192.168.1.1 -> *this is only supported in version 2* 
+
+*You can define a default network like this*
+        networks:  
+          default:  
+            external:  
+              name: my-pre-existing-network
+
+
+
+
+## Top Level Volumes Object
+
+The top-level volumes declaration lets you configure named volumes that can be reused across multiple services.  
+To use a volume across multiple services, you must explicitly grant each service access by using the volumes attribute within the services top-level element.  
+The volumes attribute has additional syntax that provides more granular control.
+
+- **name:** the name of the volume
+- **external:** true or false
+- **driver:** local (is the only driver supported by default on most systems)
+- **driver_opts:** these options differ depending on type (nfs,cifs,none, etc)
+        type: nfs
+         o: "addr=10.40.0.199,nolock,soft,rw"
+         device: ":/docker/example"
+
+### Here is an example for a smb/cifs volume
+         nas-share: \
+            driver_opts: \
+              type: cifs \
+              o: "username=[username],password=[password]" \
+              device: "//my-nas/share"
+
+### Here is an example for a local bind volume
+
+        a_volume: \
+            driver: local \
+            driver_opts: \
+              type: none \
+              o: bind \
+              device: "/opt/volumes/a_volume" \
+            name: "a_volume" '
+
+### If you just want to create just a named volume, do not specify anything else than name:
+
+        named_volume:
+            name: my_named_volume
+
+
+*The interesting thing to note here is that there are multiple types supported with local driver:
+ none, cifs, nfs, tmpfs, btrfs)*
+
+
+
 ## Docker compose networking
 
 By default Compose sets up a single network for your app.  
@@ -90,8 +205,7 @@ and is both reachable by other containers on that network,
 and discoverable by them at a hostname identical to the container name.  
 Your app’s network is given a name based on the *“project name”*, 
 which is based on the name of the directory it lives in.   
-You can override the project name with either the *--project-name* flag 
-or the *COMPOSE_PROJECT_NAME* environment variable.
+
 
 Is best to use the *name:* element for the networks defined in compose.yaml, because if you don't the network name will be prefixed by the project's name.   
 In case of external networks, I think you can get away without using the *name:* elements, and docker will try to find a name that matches the network itself, but if you want to be sure you can use the *name:*.   
@@ -179,160 +293,3 @@ See the follwing examples and try to figure it out
            target: /data  
            read_only:   
 
-
-## Here are the details of the docker-compose file syntax
-
-**build:** /path/to/Dockerfile  
-**image:** image_name:tag  
-**labels:**  
-  com.example.description: "Something Fishy"  
-**labels:**  
-  \- "com.example.description=something fishy"  
-**networks:** bridge  
-**networks:** none  
-**command:** echo "hello world"  
-**command:** ["echo","hello world"]  
-**container_name:** my_fancy_container  
-**depends-on:**  
-   \-db  
-   \-redis  
-
-**docker-compose up** starts services in dependency order.  
-In the following example, db and redis are started before web.  
-**docker-compose up SERVICE** automatically includes SERVICE’s dependencies.  
-In the example below, docker-compose up web also creates and starts db and redis.  
-**docker-compose stop** stops services in dependency order.   
-In the following example, web is stopped before db and redis.
-
-
-**restart_policy:** -> this is a new stanza that replaces restart 
-  condition: on-failure | any | none 
-  delay: 5s 
-  max_attempts: 3  
-  window: 120s -> how long to wait before deciding a restart has succeeded 
-
-**restart:** "no"  
-**restart:** always  
-**restart:** on-failure  
-**restart:** unless-stopped  
-
-**devices:**  
-  \- "/dev/ttyUSB0:/dev/ttyUSB0"  
-**dns:** 8.8.8.8  
-**dns:**  
-  \- 8.8.8.8 
-  \- 9.9.9.9  
-
-**dns_search:** example.com  
-**dns_search:**  
-  \- dc1.example.com  
-  \- dc2.example.com  
-
-**entrypoint:** /code/entrypoint.sh  
-**entrypoint:** ["php", "-d", "/bin/stuff.php"]  
-
-**environment:**  
-  VAR1: 25  
-  VAR2: "some stuff"  
-**environment:**  
-  \- VAR1=25  
-  \- VAR2="some stuff"  
-
-**extra_hosts:**  -> *add entries to /etc/hosts*  
-  \- "somehost:1.2.3.4"  
-  \- "otherhost:1.3.2.1"  
-
-**networks:**  
-  \- some-network  
-  \- other-network  
-
-ipv4_address: 1.2.3.4 -> this option should be placed inside a network section 
-
-**logging:**  
- driver: syslog | json-file  
- options:  
- syslog-address: "tcp://1.2.3.4:123"  
-
-**ports:**  
-  \- "3000"  
-  \- "3000-3005"  
-  \- "8000:8000"  
-  \- "9090-9091:8080-8081"  
-  \- "127.0.0.1:8001:8001"  
-  \- "6060:6060/udp"  
-
-**user:** postgresql  
-**working_dir:** /code  
-**domainname:** foo.com  
-**hostname:** foo  
-**mac_address:** 02:42:ac:11:65:43  
-**privileged:** true  
-**stdin_open:** true  
-**tty:** true  
-
-
-## Top Level Networks Object
-
-        **networks:**  
-         net_name:  
-        	external: true  
-        	name: actual_name_of_the_network  
-
-         net_name:  
-        	driver: bridge | macvlan | ipvlan | host | none  
-        	driver_opts:  
-        		foo: "bar"  
-        		baz: 1  
-        	attachable: true  
-        	ipam:  
-        	driver: default  
-        	config:  
-        	- subnet: 192.168.1.0/24  
-        	gateway: 192.168.1.1 -> *this is only supported in version 2* 
-
-*You can define a default network like this*
-        networks:  
-          default:  
-            external:  
-              name: my-pre-existing-network
-
-
-## Top Level Volumes Object
-
-The top-level volumes declaration lets you configure named volumes that can be reused across multiple services.  
-To use a volume across multiple services, you must explicitly grant each service access by using the volumes attribute within the services top-level element.  
-The volumes attribute has additional syntax that provides more granular control.
-
-- **name:** the name of the volume
-- **external:** true or false
-- **driver:** local (is the only driver supported by default on most systems)
-- **driver_opts:** these options differ depending on type (nfs,cifs,none, etc)
-        type: nfs
-         o: "addr=10.40.0.199,nolock,soft,rw"
-         device: ":/docker/example"
-
-### Here is an example for a smb/cifs volume
-         nas-share: \
-            driver_opts: \
-              type: cifs \
-              o: "username=[username],password=[password]" \
-              device: "//my-nas/share"
-
-### Here is an example for a local bind volume
-
-        a_volume: \
-            driver: local \
-            driver_opts: \
-              type: none \
-              o: bind \
-              device: "/opt/volumes/a_volume" \
-            name: "a_volume" '
-
-### If you just want to create just a named volume, do not specify anything else than name:
-
-        named_volume:
-            name: my_named_volume
-
-
-*The interesting thing to note here is that there are multiple types supported with local driver:
- none, cifs, nfs, tmpfs, btrfs)*

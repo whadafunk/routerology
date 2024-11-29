@@ -34,6 +34,7 @@
     28. DNS discussion: zone types, zone vs domain
     29. AAA / RADIUS
     30. Windows client can do packet forwarding?
+	SSH Forwarding: you can connect through remote VPN to a host. How do you initiate connections from the host back to your local machine
     31. VPN types: L2 vs L3
     32. VPN Features (encryption, authenticity, private ip encapsulation)
     33. Tunnel use cases
@@ -54,6 +55,8 @@
     47. What are some of the features of SSH
     48. STDOUT, STDERR, STDIN
     49.  2>&1
+	Talk about docker multistage build
+	Talk about docker multiarch build
     50. gzip -dc my_file.tar.gz | tar xvf - -C
     51. tar cvf - .\ | ssh „tar xvf - -C /usr/src
     52. What is threat modeling. Do you know any methods? How would you go about such task?

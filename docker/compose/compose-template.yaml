@@ -1,0 +1,103 @@
+# https://docs.docker.com/reference/compose-file/
+
+name: mycomprojex
+services:
+  phpine:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    image: routerology/phpine:latest
+    container_name: phpine
+    hostname: phpine
+    init: false
+    privileged: false
+    user: root
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+      - ALL
+    cap_drop:
+    user: admin
+    depends_on:
+      mariadb:
+        condition: service_healthy
+        restart: true
+        required: true 
+    restart: unless-stopped
+    healthcheck: see the documentation
+    stdin_open: true
+    tty: true
+    dns:
+      - 1.1.1.1
+      - 9.9.9.9
+    domainname: routerology.com
+    ports:
+      - "8080:80/tcp"
+      - "8000-8100:9000-9100"
+      - "127.0.0.1:8000:80/tcp"
+    expose:
+      - "8080-8085/tcp"
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpass
+      - MYSQL_USERNAME=dbuser
+    env_file: ./envars_file
+    command: ["bin/bash","script,sh"]
+    entrypoint:
+      - /bin/bash
+      - ./script.sh
+    sysctls:
+      - net.core.somaxconn=1024
+      - net.ipv4.tcp_syncookies=0
+    
+    networks:
+      default:
+        ipv4_address: 1.2.3.4/24
+        priority: 50
+        aliases:
+          - phpine_a
+          - phpine_b
+
+    volumes:
+      - vol1:/opt/vol1:ro
+      - ./data:/opt/vol2:rw
+      - type: bind
+        source: ./dataset
+        target: /var/dataset
+      - type: volume
+        source: vol_x
+        target: /var/vol_x
+
+ 
+      
+networks:
+  default:
+    external: true
+    name: bridge
+  
+  macnet:
+    external: false
+    name: macnet
+    attachable: true
+    driver: macvlan
+    driver_opts:
+      parent: eth0
+      macvlan_mode: bridge
+    ipam:
+    driver: default
+      config:
+        - subnet: 192.168.10.0/24
+          gateway: 192.168.10.1
+          ip_range: 192.168.10.128/25
+          aux_addresses:
+            gigi1: 192.168.10.130
+            gigi2: 192.168.10.131 
+
+volumes:
+  cifvol:
+    name: cifvol
+    driver: local
+      driver_opts:
+        type: cifs
+        device: //192.168.100.10/vol
+        o: username=gigi,password=gigipass
+
