@@ -1,0 +1,46 @@
+Layer 3 adoption is the process of adopting a UniFi device to a remote or cloud-hosted UniFi Network Application. 
+
+
+Method-1 SSH:
+
+ssh into the ap -> ssh root@ap_address
+default passwords: ui or ubnt
+set-inform http://ip-of-host:8080/inform
+
+
+Method-2 DHCP option 43:
+
+
+
+
+This option leverages your DHCP server to inform your UniFi device of the location of the machine running the Network Application remotely. Those with a UniFi Gateway can easily accomplish this by entering the IP address of the remote Network Application in Option 43 Application Host Address field located in the Network Settings.
+
+For those using a third-party gateway or DHCP server, we recommend consulting your manufacturer’s documentation to learn more.
+
+
+
+Method-3 DNS:
+
+
+
+You'll need to configure your DNS server to resolve
+unifi
+to your remote UniFi Network Application.
+
+There are two methods of specifying the machine running the Network Application:
+
+    IP Address: http://ip-address:8080/inform
+    Fully Qualified Domain Name (FQDN): http://FQDN:8080/inform
+
+
+DHCP Option 43 Details:
+
+
+Code need to be set to 43.
+DHCP Option Type needs to be set to Hexadecimal.
+Value needs a specific prefix of 01:04. Followed by another : and your controllers ip address in hexadecimal notation.
+192.168.100.10 would translate to c0a8640a. In this case you need to enter 01:04:c0:a8:64:0a as your Value.
+
+
+
+
