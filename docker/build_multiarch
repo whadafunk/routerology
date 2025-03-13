@@ -1,4 +1,4 @@
-docker buildx create --name mybuilder --use
+docker buildx create --name mybuilder --driver bxname --use --bootstrap
 docker buildx inspect --bootstrap
 
 

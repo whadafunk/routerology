@@ -1,0 +1,25 @@
+[Interface]
+Address = 10.0.0.1/24
+ListenPort = 51820
+PrivateKey = YOUR_SERVER_PRIVATE_KEY
+PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+SaveConfig = true
+
+
+[Interface]
+PrivateKey = YOUR_CLIENT_PRIVATE_KEY
+Address = 10.0.0.3/24
+DNS = 1.1.1.1, 1.0.0.1
+
+[Peer]
+PublicKey = YOUR_SERVERS_PUBLIC_KEY
+AllowedIPs = 0.0.0.0/0
+Endpoint = YOUR_SERVER_WAN_IP:51820
+
+
+
+If you’ve added a wg-quick config, e.g. /etc/wireguard/wg0.conf, you can enable autostarting it on system boot using systemd:
+
+sudo systemctl enable --now wg-quick@wg0
+

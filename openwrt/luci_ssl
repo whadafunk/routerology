@@ -1,0 +1,30 @@
+1. Get the root CA certificate
+
+Let's get the root CA cert.
+
+openssl s_client -connect ca.private-domain.tld:443 < /dev/null > /tmp/temporary.out
+openssl x509 -outform PEM < /tmp/temporary.out > /tmp/ca.private-domain.tld.cert
+rm /tmp/temporary.out
+
+Note: Don't forget to remove the temporary file /tmp/temporary.out
+2. Install the root CA certificate
+
+Trusted certificates are installed in /etc/ssl/certs. However, it is a good practice to follow the FHS 3 and use /usr/local/share for architecture-independant files.
+
+mkdir -p /usr/local/share/ca-certificates
+mv /tmp/ca.private-domain.tld.cert /usr/local/share/ca-certificates/
+ln -s /usr/local/share/ca-certificates/ca.private-domain.tld.cert /etc/ssl/certs/ca.private-domain.tld.cert
+chmod ugo-x /usr/local/share/ca-certificates/ca.private-domain.tld.cert
+
+3. Add the root CA certificate to the system's trust store
+
+The certificate is installed but not yet trusted. You need to provide its hash.
+
+# Generate the hash
+HASH="$(openssl x509 -hash -noout -in /etc/ssl/certs/ca.private-domain.tld.cert).0"
+ 
+# Display the hash value
+echo "$HASH"
+ 
+# Link the hash to the certificate
+ln -s "/etc/ssl/certs/ca.private-domain.tld.cert" "/etc/ssl/certs/$HASH"

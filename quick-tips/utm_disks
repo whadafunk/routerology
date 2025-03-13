@@ -1,0 +1,1 @@
+qemu-img convert -O qcow2 <File name>.vmdk <File name>.qcow2
