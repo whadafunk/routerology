@@ -14,6 +14,13 @@
     10. Tell me a couple of features of the ICMP protocol
     11. How a network switch is working
     12. How a network router is working
+    packet vs frame
+    forwarding vs routing
+    2 switches with access ports in vlan 10 and vlan 20
+    pc's from different network classes 192.168.1.10/24 and 192.168.2.10/24
+    how to route those pcs
+    - reduce netmask
+    - install a 3rd pc (secondary ip address, reduced netmask, 
     13. What means packet forwarding?
     14. What RPF means to you ? What is asymmetric routing ?
     15. What is NAT, and some of its use-cases: Public SNAT, Service Publish, Overlapping Addresses
