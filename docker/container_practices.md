@@ -46,3 +46,20 @@ Is best to enclose all those options in a startup script.
 - profiles
 
 ## Use shell mode for RUN and exec mode for ENTRYPOINT and CMD
+
+
+### Other actions
+
+- Prompt PS1
+- Create admin user
+- Update CA certificates
+- Set timezone
+- Configure logging
+- copy /etc/profile
+- install ssh keys
+- package repo update
+- package repo cache delete
+- DEBIAN_FRONTEND=noninteractive
+- /var/log/admin/summary
+- /var/log/admin/journal
+
