@@ -14,6 +14,15 @@
     10. Tell me a couple of features of the ICMP protocol
     11. How a network switch is working
     12. How a network router is working
+    packet vs frame
+    forwarding vs routing
+    2 switches with access ports in vlan 10 and vlan 20
+    pc's from different network classes 192.168.1.10/24 and 192.168.2.10/24
+    how to route those pcs
+    - reduce netmask
+    - install a 3rd pc (secondary ip address, reduced netmask, 
+    What determines the source IP address used by a host when sending packets if no explicit source IP is specified?
+    
     13. What means packet forwarding?
     14. What RPF means to you ? What is asymmetric routing ?
     15. What is NAT, and some of its use-cases: Public SNAT, Service Publish, Overlapping Addresses
@@ -87,3 +96,18 @@
         a. Profesional
         b. Personal
     61. Calitati distinctive
+
+    If you could give your younger self one piece of advice, what would it be and why?
+
+What habits or routines have you cultivated that you believe are key to your personal success?
+
+How do you measure personal growth beyond traditional achievements like promotions or awards?
+
+What role does vulnerability play in your relationships and work?
+
+How do you navigate conflicting priorities in your life without losing your sense of purpose?
+What’s a personal challenge you faced that changed how you view your work or life? How did you overcome it?
+
+Can you describe a moment when a failure or mistake ended up teaching you something valuable?
+
+What motivates you to keep going on days when everything feels overwhelming or discouraging?
