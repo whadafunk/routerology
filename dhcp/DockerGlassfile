@@ -1,0 +1,32 @@
+# Run both ISC DHCP and Glass WebGUI
+# GLASS Project - > https://github.com/Akkadius/glass-isc-dhcp?tab=readme-ov-file#installation
+# Work to be done:
+# Create the entry point file that will start both dhcp and glass (npm start under /opt/glass-isc-dhcp)
+
+FROM alpine:3.20
+MAINTAINER gri.daniel@gmail.com
+RUN apk update
+RUN apk add \
+	nodejs \
+	npm \
+	git \
+	bind-tools \
+	bash \
+	dhcp-server-vanilla
+WORKDIR /opt
+RUN git clone https://github.com/Akkadius/glass-isc-dhcp.git
+WORKDIR /opt/glass-isc-dhcp
+RUN mkdir logs
+RUN chmod -R u+x ./bin/ && \
+    chmod u+x *.sh
+RUN npm install
+RUN npm install forever -g
+
+COPY ./glass-entrypoint.sh /opt
+COPY ./dhcpd.conf /etc/dhcp/dhcpd.conf
+# touch /var/lib/dhcpd/dhcpd.leases
+# DHCPD start options
+# -f -> foreground, -d -> debug logging, -p -> custom port
+# -cf -> config file, -lf -> lease file, -pf -> pid file
+# -q -> suppress copyright message on start
+ENTRYPOINT ["/opt/glass-entrypoint.sh"]

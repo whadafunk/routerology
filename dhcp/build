@@ -1,0 +1,3 @@
+#!/bin/bash
+docker buildx build --platform linux/amd64,linux/arm64 --tag routerology/dhcpd:3.20 --tag routerology/dhcpd:latest --push .
+docker buildx build --platform linux/amd64,linux/arm64 --tag routerology/dhcpd:3.20_glass --push -f ./DockerGlassfile .

@@ -51,7 +51,7 @@ services:
     
     networks:
       default:
-        ipv4_address: 1.2.3.4/24
+        ipv4_address: 1.2.3.4
         priority: 50
         aliases:
           - phpine_a

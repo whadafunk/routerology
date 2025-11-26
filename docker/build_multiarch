@@ -1,6 +1,8 @@
 docker buildx create --name mybuilder --driver bxname --use --bootstrap
 docker buildx inspect --bootstrap
 
+docker buildx use mybuilder2
+
 
 docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 \
   -t yourusername/multi-arch-demo:latest \
@@ -14,6 +16,15 @@ docker buildx create --name mybuilder --use
 docker buildx install
 # Build for multiple platforms
 docker build --platform linux/amd64,linux/arm64 .
+
+
+| Driver Name          | Description                                                          | Pros                                                      | Cons                                             |
+| -------------------- | -------------------------------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------ |
+| **docker**           | Uses the **local Docker engine**.                                    | Simple, fast, no extra setup                              | Single-arch builds only (usually)                |
+| **docker-container** | Runs BuildKit inside a **container**.                                | Multiarch support via QEMU, isolated environment, caching | Slightly slower, needs bootstrap (`--bootstrap`) |
+| **kubernetes**       | Uses a **K8s cluster** to run builds.                                | Can scale builds massively, distributed caching           | Requires a K8s cluster                           |
+| **remote**           | Uses **remote BuildKit hosts** via TCP.                              | Remote/offloaded builds                                   | Needs network setup, security config             |
+| **custom**           | You can write a custom driver pointing to a specific BuildKit setup. | Full control                                              | Advanced setup                                   |
 
 
 

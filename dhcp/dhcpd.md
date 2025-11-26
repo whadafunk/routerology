@@ -10,6 +10,8 @@ The configuration file uses two types of statements that can be:
 
 - declarations
 - parameters
+- classes & subclasses
+- options
 
 The declarations are the ones that describe the network topology.  
 The parameters are telling the server how to do specific things,  
@@ -62,9 +64,6 @@ configure these parameters only once for all the group.
 
 The last important declaration is the pool, which can be used to differentiate multiple types of hosts under the same subnet. You configure specific options for the pool and use allow and deny statements to match clients on specific pool.  
 For example you can use allow knonwn-clients, which means that the pool matches only the clients that have matching host declarations in your config.
-
-*I'm not entirely sure about the correct way to place pool in the config. It seems that you can enclose pool inside the subnet declaration,  
-but you can also put it outside subnet, in which case you need to include a range statement enclosed directly inside pool.*
 
 When a client is to be booted, its boot parameters are determined by consulting that client's host declaration (if any),  
  and then consulting any class declarations matching the client, followed by the pool, subnet and shared-network declarations
@@ -206,10 +205,11 @@ pool  clients-a {
  
 class "clients-b" {  
  match substring ( option dhcp-client-identifier, 1, 3);  
+	option a;
 }  
-subclass "clients-blue" "value-blue";  
-subclass "clients-red" 	"value-red";  
-subclass "clients-brown" "value-brown" {  
+subclass "clients-b" "value-blue";  
+subclass "clients-b" 	"value-red";  
+subclass "clients-b" "value-brown" {  
 	option 1;  
 	option 2;  
 }   
