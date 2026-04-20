@@ -1,0 +1,10 @@
+/server-test/
+├── index.php (main page with tabs)
+├── sections/server-info-sections.php (all server info)
+├── api/
+│   ├── download.php
+│   ├── upload.php
+│   ├── stress-test.php
+│   └── user-agent-test.php
+├── assets/js/main.js (all frontend logic)
+└── README.md (complete documentation)

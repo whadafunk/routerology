@@ -112,7 +112,7 @@ $mtls_info = getMTLSInfo();
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Advanced PHP / HAProxy Test Suite v2</title>
+<title>Routerology Web Test Suite v2</title>
 <style>
 * { box-sizing: border-box; }
 body { background: #1e1e1e; color: #c5c5c5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin:0; padding:0; }
@@ -177,7 +177,7 @@ pre { background:#2b2b2b; padding:15px; border-radius:5px; overflow:auto; margin
 </head>
 <body>
 <header>
-<h1>🚀 Advanced PHP / HAProxy Test Suite v2</h1>
+<h1>Routerology Web Test Suite v2</h1>
 <div class="header-line">
     <span class="key">Server:</span> <span class="value"><?=htmlspecialchars($metrics['hostname'])?> | IP: <?=htmlspecialchars($metrics['server_ip'])?> | Port: <?=htmlspecialchars($metrics['server_port'])?></span>
     <span class="badge <?=strtolower(str_replace(['/', '.'], '', $http_version))?>"><?=$http_version?></span>
@@ -203,8 +203,6 @@ pre { background:#2b2b2b; padding:15px; border-radius:5px; overflow:auto; margin
         <button class="tab" data-tab="sticky">🔄 Session Sticky</button>
         <button class="tab" data-tab="parallel">⚡ Parallel</button>
         <button class="tab" data-tab="health">💚 Health Check</button>
-        <button class="tab" data-tab="auth">🔐 Auth Test</button>
-        <button class="tab" data-tab="haproxy">⚙️ HAProxy Configs</button>
         <button class="tab" data-tab="cookies">🍪 Cookies</button>
         <button class="tab" data-tab="useragent">🌐 User-Agent</button>
         <button class="tab" data-tab="help">❓ Help</button>
@@ -245,22 +243,6 @@ pre { background:#2b2b2b; padding:15px; border-radius:5px; overflow:auto; margin
                 </select>
             </div>
 
-            <div class="form-group">
-                <label>Speed Limit (optional)</label>
-                <select id="downloadSpeedLimit">
-                    <option value="0">No Limit (Max Speed)</option>
-                    <option value="10">10 KB/s (Very Slow)</option>
-                    <option value="50">50 KB/s (Slow)</option>
-                    <option value="100">100 KB/s (Moderate)</option>
-                    <option value="500">500 KB/s (Medium)</option>
-                    <option value="1024">1 MB/s (Fast)</option>
-                    <option value="5120">5 MB/s (Very Fast)</option>
-                </select>
-                <small style="color: #8be9fd; display: block; margin-top: 5px;">
-                    Limit download speed to test bytes_out_rate stick-table scenarios
-                </small>
-            </div>
-
             <button class="btn" onclick="startDownload()">Start Download</button>
             
             <div class="progress-bar" style="display:none;" id="downloadProgress">
@@ -293,22 +275,6 @@ pre { background:#2b2b2b; padding:15px; border-radius:5px; overflow:auto; margin
             <div class="form-group">
                 <label>Chunk Size (KB)</label>
                 <input type="number" id="chunkSize" value="1024" min="64" max="4096">
-            </div>
-
-            <div class="form-group">
-                <label>Speed Limit (optional)</label>
-                <select id="uploadSpeedLimit">
-                    <option value="0">No Limit (Max Speed)</option>
-                    <option value="10">10 KB/s (Very Slow)</option>
-                    <option value="50">50 KB/s (Slow)</option>
-                    <option value="100">100 KB/s (Moderate)</option>
-                    <option value="500">500 KB/s (Medium)</option>
-                    <option value="1024">1 MB/s (Fast)</option>
-                    <option value="5120">5 MB/s (Very Fast)</option>
-                </select>
-                <small style="color: #8be9fd; display: block; margin-top: 5px;">
-                    Limit upload speed to test bytes_in_rate stick-table scenarios
-                </small>
             </div>
 
             <button class="btn" onclick="startUpload()">Start Upload</button>
@@ -354,16 +320,6 @@ pre { background:#2b2b2b; padding:15px; border-radius:5px; overflow:auto; margin
                     <label>Target Endpoint</label>
                     <input type="text" id="stressEndpoint" value="api/stress-test.php" placeholder="/api/endpoint">
                 </div>
-            </div>
-
-            <div class="form-group">
-                <label style="display: flex; align-items: center; cursor: pointer;">
-                    <input type="checkbox" id="stressForceNewConn" style="width: auto; margin-right: 10px;">
-                    <span>Force New Connections (Disable Keep-Alive) - Use for testing conn_rate</span>
-                </label>
-                <small style="color: #8be9fd; display: block; margin-top: 5px;">
-                    ⚠️ When enabled, each request opens a new TCP connection. Useful for HAProxy conn_rate testing.
-                </small>
             </div>
 
             <button class="btn" onclick="startStressTest()" id="stressBtn">Start Stress Test</button>
@@ -534,16 +490,6 @@ pre { background:#2b2b2b; padding:15px; border-radius:5px; overflow:auto; margin
                 </div>
             </div>
 
-            <div class="form-group">
-                <label style="display: flex; align-items: center; cursor: pointer;">
-                    <input type="checkbox" id="parallelForceNewConn" style="width: auto; margin-right: 10px;">
-                    <span>Force New Connections (Disable Keep-Alive) - Use for testing conn_cur/conn_rate</span>
-                </label>
-                <small style="color: #8be9fd; display: block; margin-top: 5px;">
-                    ⚠️ When enabled, each connection attempt forces a new TCP connection. Required for accurate conn_cur and conn_rate testing.
-                </small>
-            </div>
-
             <button class="btn" onclick="testParallelConnections()" id="parallelBtn">Start Test</button>
             <button class="btn btn-danger" onclick="stopParallelTest()" id="parallelStopBtn" style="display:none;">Stop</button>
 
@@ -566,64 +512,6 @@ pre { background:#2b2b2b; padding:15px; border-radius:5px; overflow:auto; margin
         <div class="card" style="background: #2b4a6f; border: 1px solid #4a7ba7; margin-bottom: 15px; padding: 12px;">
             <strong style="color: #8be9fd;">💡 Quick Guide:</strong> Simulate different health check responses to test load balancer behavior. Try status 200 (healthy), 503 (down), or add delays. Use "Start Monitoring" to run continuous health checks every 5 seconds.
         </div>
-        
-        <div class="card" style="background: #2d2d2d; border-left: 4px solid #8be9fd; margin-bottom: 15px; padding: 15px;">
-            <h3 style="margin-top: 0; color: #8be9fd;">How This Works</h3>
-            <p><strong>Purpose:</strong> This tab helps you test how HAProxy (or any load balancer) reacts to different health check responses from your backend server.</p>
-            
-            <h4>Two Testing Modes:</h4>
-            <p><strong>1. Test Health Check (Single Request):</strong></p>
-            <ul style="margin: 5px 0 15px 20px;">
-                <li>Sends ONE request to the health endpoint</li>
-                <li>You configure what response it should return (status code, delay, body)</li>
-                <li>Use this to verify the endpoint works correctly</li>
-                <li>Example: "Does my health check return 200 OK as expected?"</li>
-            </ul>
-            
-            <p><strong>2. Start Monitoring (Continuous):</strong></p>
-            <ul style="margin: 5px 0 15px 20px;">
-                <li>Sends requests every 5 seconds automatically</li>
-                <li>Simulates what HAProxy does continuously in production</li>
-                <li>Shows success rate, average response time, failures</li>
-                <li>Use this to test sustained health check behavior</li>
-                <li>Example: "Can my server handle health checks every 5 seconds?"</li>
-            </ul>
-            
-            <h4>Configuration Options:</h4>
-            <p><strong>Response Status Code:</strong> What HTTP status the health endpoint returns</p>
-            <ul style="margin: 5px 0 10px 20px;">
-                <li><code>200 OK</code> - Server is healthy (HAProxy keeps it in pool)</li>
-                <li><code>503 Service Unavailable</code> - Server is down (HAProxy removes it)</li>
-                <li><code>500 Internal Server Error</code> - Server has issues (HAProxy may remove it)</li>
-            </ul>
-            
-            <p><strong>Response Delay:</strong> Simulates slow health check (in milliseconds)</p>
-            <ul style="margin: 5px 0 10px 20px;">
-                <li><code>0ms</code> - Instant response (healthy server)</li>
-                <li><code>2000ms</code> - 2 second delay (slow server, may trigger timeout)</li>
-                <li><code>5000ms</code> - 5 second delay (will likely timeout in HAProxy)</li>
-            </ul>
-            
-            <h4>Use Cases:</h4>
-            <p><strong>Scenario 1 - Verify Health Endpoint:</strong></p>
-            <code style="display: block; background: #1e1e1e; padding: 10px; border-radius: 3px; margin: 5px 0;">
-                Status: 200 OK, Delay: 0ms → Click "Test Health Check"<br>
-                Expected: ✓ Response in <50ms
-            </code>
-            
-            <p><strong>Scenario 2 - Simulate Server Down:</strong></p>
-            <code style="display: block; background: #1e1e1e; padding: 10px; border-radius: 3px; margin: 5px 0;">
-                Status: 503, Delay: 0ms → Click "Start Monitoring"<br>
-                Expected: HAProxy removes this server from pool
-            </code>
-            
-            <p><strong>Scenario 3 - Test Timeout Handling:</strong></p>
-            <code style="display: block; background: #1e1e1e; padding: 10px; border-radius: 3px; margin: 5px 0;">
-                Status: 200 OK, Delay: 5000ms → Click "Test Health Check"<br>
-                Expected: Request times out (if HAProxy timeout < 5s)
-            </code>
-        </div>
-        
         <div class="card">
             <h2>Health Check Simulator</h2>
             <p>Simulate different health check responses to test load balancer behavior.</p>
@@ -668,447 +556,6 @@ pre { background:#2b2b2b; padding:15px; border-radius:5px; overflow:auto; margin
             </div>
 
             <div id="healthLog" class="log" style="display:none;"></div>
-        </div>
-    </div>
-
-    <!-- AUTHENTICATION TEST TAB -->
-    <div id="auth" class="tab-content">
-        <div class="card" style="background: #2b4a6f; border: 1px solid #4a7ba7; margin-bottom: 15px; padding: 12px;">
-            <strong style="color: #8be9fd;">💡 Quick Guide:</strong> Test authentication scenarios including successful logins, failed logins, and rate limiting. Use test credentials below or try invalid ones to simulate attacks.
-        </div>
-        
-        <div class="card" style="background: #2d2d2d; border-left: 4px solid #50fa7b; margin-bottom: 15px; padding: 15px;">
-            <h3 style="margin-top: 0; color: #50fa7b;">📋 Test Credentials</h3>
-            <table style="width: 100%; border-collapse: collapse;">
-                <tr style="border-bottom: 1px solid #444;">
-                    <th style="text-align: left; padding: 8px; color: #ffb86c;">Username</th>
-                    <th style="text-align: left; padding: 8px; color: #ffb86c;">Password</th>
-                    <th style="text-align: left; padding: 8px; color: #ffb86c;">Role</th>
-                    <th style="text-align: left; padding: 8px; color: #ffb86c;">Notes</th>
-                </tr>
-                <tr style="border-bottom: 1px solid #333;">
-                    <td style="padding: 8px;"><code>admin</code></td>
-                    <td style="padding: 8px;"><code>Admin123!</code></td>
-                    <td style="padding: 8px;">Administrator</td>
-                    <td style="padding: 8px;">Full access, use for valid login tests</td>
-                </tr>
-                <tr style="border-bottom: 1px solid #333;">
-                    <td style="padding: 8px;"><code>testuser</code></td>
-                    <td style="padding: 8px;"><code>Test123!</code></td>
-                    <td style="padding: 8px;">Regular User</td>
-                    <td style="padding: 8px;">Standard access, use for normal scenarios</td>
-                </tr>
-                <tr>
-                    <td style="padding: 8px;"><code>readonly</code></td>
-                    <td style="padding: 8px;"><code>Read123!</code></td>
-                    <td style="padding: 8px;">Read-Only</td>
-                    <td style="padding: 8px;">Limited access, use for permission tests</td>
-                </tr>
-            </table>
-            <p style="margin-top: 15px; margin-bottom: 0;"><strong>Invalid Credentials:</strong> Use any other username/password combination to simulate failed authentication attempts.</p>
-        </div>
-        
-        <div class="card">
-            <h2>Authentication Test</h2>
-            
-            <div class="form-group">
-                <label>Test Scenario</label>
-                <select id="authScenario">
-                    <option value="single-valid">Single Valid Login (admin credentials)</option>
-                    <option value="single-invalid">Single Invalid Login (wrong password)</option>
-                    <option value="brute-force">Brute Force Simulation (multiple failed attempts)</option>
-                    <option value="custom">Custom Credentials</option>
-                </select>
-            </div>
-
-            <div id="authCustomFields" style="display:none;">
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="authUsername" placeholder="Enter username">
-                </div>
-
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="authPassword" placeholder="Enter password">
-                </div>
-            </div>
-
-            <div id="authBruteFields" style="display:none;">
-                <div class="form-group">
-                    <label>Number of Failed Attempts</label>
-                    <input type="number" id="authAttempts" value="10" min="1" max="100">
-                    <small style="color: #8be9fd; display: block; margin-top: 5px;">
-                        Test HAProxy http_err_rate tracking - simulate authentication attack
-                    </small>
-                </div>
-            </div>
-
-            <button class="btn" onclick="testAuthentication()">Run Authentication Test</button>
-
-            <div id="authResults" style="display:none; margin-top: 20px;">
-                <h3>Test Results</h3>
-                <div class="grid">
-                    <div><span class="key">Total Attempts:</span> <span class="value" id="authTotal">0</span></div>
-                    <div><span class="key">Successful:</span> <span class="value" id="authSuccess">0</span></div>
-                    <div><span class="key">Failed:</span> <span class="value" id="authFailed">0</span></div>
-                    <div><span class="key">Blocked:</span> <span class="value" id="authBlocked">0</span></div>
-                </div>
-            </div>
-
-            <div id="authLog" class="log" style="display:none;"></div>
-        </div>
-
-        <div class="card" style="margin-top: 15px;">
-            <h3>HAProxy Configuration for Auth Testing</h3>
-            <p>Use these HAProxy configurations to test authentication failure scenarios:</p>
-            
-            <h4>1. Track Failed Authentication Attempts (http_err_rate)</h4>
-            <pre style="background: #1e1e1e; padding: 15px; border-radius: 5px; overflow-x: auto;">backend auth_backend
-    # Track HTTP 401/403 error rate per IP
-    stick-table type ip size 100k expire 5m store http_err_rate(10s)
-    http-request track-sc0 src
-    
-    # Block IPs with >5 failed auth attempts in 10s
-    http-request deny deny_status 429 if { sc_http_err_rate(0) gt 5 }
-    
-    server backend1 192.168.1.10:80 check</pre>
-
-            <h4>2. Track with General Purpose Counter (GPC)</h4>
-            <pre style="background: #1e1e1e; padding: 15px; border-radius: 5px; overflow-x: auto;">backend auth_backend
-    # Track failed logins with custom counter
-    stick-table type ip size 100k expire 5m store gpc0,http_req_rate(10s)
-    http-request track-sc0 src
-    
-    # Increment counter on 401 Unauthorized
-    http-response sc-inc-gpc0(0) if { status 401 }
-    
-    # Block after 3 failed attempts
-    http-request deny deny_status 429 if { sc_get_gpc0(0) gt 3 }
-    
-    server backend1 192.168.1.10:80 check</pre>
-
-            <h4>How to Test:</h4>
-            <ol>
-                <li>Configure HAProxy with one of the configs above</li>
-                <li>Select "Brute Force Simulation" scenario</li>
-                <li>Set attempts to 10</li>
-                <li>Click "Run Authentication Test"</li>
-                <li>Expected: First 5-6 attempts return 401, then HAProxy blocks with 429</li>
-            </ol>
-        </div>
-    </div>
-
-    <!-- HAPROXY CONFIG SNIPPETS TAB -->
-    <div id="haproxy" class="tab-content">
-        <div class="card">
-            <h1 style="color: #00ffff;">⚙️ HAProxy Stick-Table Security Configurations</h1>
-            <p>Top 10 most common HAProxy stick-table use cases for security, with testing instructions for this app.</p>
-
-            <div class="section">
-                <div class="section-header" data-section-id="haproxy_1">
-                    <span><strong>1. HTTP Request Rate Limiting</strong></span>
-                    <span id="haproxy_1_icon" class="section-icon">▼</span>
-                </div>
-                <div class="section-content" id="haproxy_1">
-                    <p><strong>Use Case:</strong> Prevent API abuse by limiting requests per IP</p>
-                    <pre>backend api_backend
-    # Allow max 100 requests per 10 seconds per IP
-    stick-table type ip size 100k expire 30s store http_req_rate(10s)
-    http-request track-sc0 src
-    http-request deny deny_status 429 if { sc_http_req_rate(0) gt 100 }
-    
-    server api1 192.168.1.10:80 check</pre>
-                    <h4>How to Test:</h4>
-                    <ol>
-                        <li>Go to <strong>🔥 Stress Test</strong> tab</li>
-                        <li>Set: 150 requests, 20 concurrent</li>
-                        <li>Uncheck "Force New Connections"</li>
-                        <li>Click "Start Stress Test"</li>
-                        <li><strong>Expected:</strong> First ~100 succeed, then 429 errors</li>
-                    </ol>
-                </div>
-            </div>
-
-            <div class="section">
-                <div class="section-header" data-section-id="haproxy_2">
-                    <span><strong>2. Download Bandwidth Limiting</strong></span>
-                    <span id="haproxy_2_icon" class="section-icon">▼</span>
-                </div>
-                <div class="section-content" id="haproxy_2">
-                    <p><strong>Use Case:</strong> Prevent bandwidth abuse, limit download speeds per IP</p>
-                    <pre>backend download_backend
-    # Limit to 10MB/s per IP (10000000 bytes/sec)
-    stick-table type ip size 100k expire 5m store bytes_out_rate(60s)
-    http-request track-sc0 src
-    http-request deny deny_status 429 if { sc_bytes_out_rate(0) gt 10000000 }
-    
-    server download1 192.168.1.10:80 check</pre>
-                    <h4>How to Test:</h4>
-                    <ol>
-                        <li>Go to <strong>⬇️ Download</strong> tab</li>
-                        <li>Select: 100MB file, Random Data</li>
-                        <li>Speed Limit: No Limit</li>
-                        <li>Download multiple times rapidly</li>
-                        <li><strong>Expected:</strong> Downloads succeed until bandwidth limit hit, then 429</li>
-                    </ol>
-                </div>
-            </div>
-
-            <div class="section">
-                <div class="section-header" data-section-id="haproxy_3">
-                    <span><strong>3. Upload Bandwidth Limiting</strong></span>
-                    <span id="haproxy_3_icon" class="section-icon">▼</span>
-                </div>
-                <div class="section-content" id="haproxy_3">
-                    <p><strong>Use Case:</strong> Prevent upload flooding, limit incoming bandwidth per IP</p>
-                    <pre>backend upload_backend
-    # Limit to 5MB/s per IP (5000000 bytes/sec)
-    stick-table type ip size 100k expire 5m store bytes_in_rate(60s)
-    http-request track-sc0 src
-    http-request deny deny_status 429 if { sc_bytes_in_rate(0) gt 5000000 }
-    
-    server upload1 192.168.1.10:80 check</pre>
-                    <h4>How to Test:</h4>
-                    <ol>
-                        <li>Go to <strong>⬆️ Upload</strong> tab</li>
-                        <li>Select: 50MB, chunk size 1024KB</li>
-                        <li>Speed Limit: No Limit</li>
-                        <li>Upload multiple times rapidly</li>
-                        <li><strong>Expected:</strong> Uploads succeed until bandwidth limit hit, then 429</li>
-                    </ol>
-                </div>
-            </div>
-
-            <div class="section">
-                <div class="section-header" data-section-id="haproxy_4">
-                    <span><strong>4. Connection Rate Limiting (SYN Flood Protection)</strong></span>
-                    <span id="haproxy_4_icon" class="section-icon">▼</span>
-                </div>
-                <div class="section-content" id="haproxy_4">
-                    <p><strong>Use Case:</strong> Protect against SYN flood DDoS attacks</p>
-                    <pre>frontend http_front
-    bind *:80
-    
-    # Allow max 20 new connections per 10 seconds per IP
-    stick-table type ip size 100k expire 30s store conn_rate(10s)
-    tcp-request connection track-sc0 src
-    tcp-request connection reject if { sc_conn_rate(0) gt 20 }
-    
-    default_backend web_backend</pre>
-                    <h4>How to Test:</h4>
-                    <ol>
-                        <li>Go to <strong>⚡ Parallel</strong> tab</li>
-                        <li>Set: 25 connections, 1 second hold</li>
-                        <li><strong>✅ Check "Force New Connections"</strong></li>
-                        <li>Click "Start Test"</li>
-                        <li><strong>Expected:</strong> First ~20 succeed, rest fail/blocked</li>
-                    </ol>
-                    <p style="color: #f1fa8c;"><strong>Important:</strong> Must enable "Force New Connections" or add <code>option httpclose</code> to HAProxy!</p>
-                </div>
-            </div>
-
-            <div class="section">
-                <div class="section-header" data-section-id="haproxy_5">
-                    <span><strong>5. Concurrent Connection Limiting</strong></span>
-                    <span id="haproxy_5_icon" class="section-icon">▼</span>
-                </div>
-                <div class="section-content" id="haproxy_5">
-                    <p><strong>Use Case:</strong> Limit simultaneous connections per IP</p>
-                    <pre>frontend http_front
-    bind *:80
-    
-    # Allow max 10 concurrent connections per IP
-    stick-table type ip size 100k expire 30s store conn_cur
-    tcp-request connection track-sc0 src
-    tcp-request connection reject if { sc_conn_cur(0) gt 10 }
-    
-    default_backend web_backend</pre>
-                    <h4>How to Test:</h4>
-                    <ol>
-                        <li>Go to <strong>⚡ Parallel</strong> tab</li>
-                        <li>Set: 15 connections, 10 seconds hold</li>
-                        <li><strong>✅ Check "Force New Connections"</strong></li>
-                        <li>Click "Start Test"</li>
-                        <li><strong>Expected:</strong> First 10 succeed and hold, next 5 fail immediately</li>
-                    </ol>
-                </div>
-            </div>
-
-            <div class="section">
-                <div class="section-header" data-section-id="haproxy_6">
-                    <span><strong>6. Authentication Failure Rate Limiting</strong></span>
-                    <span id="haproxy_6_icon" class="section-icon">▼</span>
-                </div>
-                <div class="section-content" id="haproxy_6">
-                    <p><strong>Use Case:</strong> Block brute-force login attempts</p>
-                    <pre>backend auth_backend
-    # Track HTTP error rate (401/403)
-    stick-table type ip size 100k expire 5m store http_err_rate(10s)
-    http-request track-sc0 src
-    
-    # Block after 5 auth failures in 10 seconds
-    http-request deny deny_status 429 if { sc_http_err_rate(0) gt 5 }
-    
-    server auth1 192.168.1.10:80 check</pre>
-                    <h4>How to Test:</h4>
-                    <ol>
-                        <li>Go to <strong>🔐 Auth Test</strong> tab</li>
-                        <li>Select: "Brute Force Simulation"</li>
-                        <li>Set: 10 failed attempts</li>
-                        <li>Click "Run Authentication Test"</li>
-                        <li><strong>Expected:</strong> First 5-6 return 401, then 429 (rate limited)</li>
-                    </ol>
-                </div>
-            </div>
-
-            <div class="section">
-                <div class="section-header" data-section-id="haproxy_7">
-                    <span><strong>7. Custom Counter for Suspicious Behavior</strong></span>
-                    <span id="haproxy_7_icon" class="section-icon">▼</span>
-                </div>
-                <div class="section-content" id="haproxy_7">
-                    <p><strong>Use Case:</strong> Track and block custom patterns (SQL injection attempts, scanner tools, etc.)</p>
-                    <pre>backend web_backend
-    # Use General Purpose Counter (GPC)
-    stick-table type ip size 100k expire 10m store gpc0,http_req_rate(10s)
-    http-request track-sc0 src
-    
-    # Increment counter on suspicious patterns
-    http-request sc-inc-gpc0(0) if { path_beg /admin } { method GET }
-    http-request sc-inc-gpc0(0) if { url_param(id) -m found } { url_param(id) -m sub "'" }
-    http-request sc-inc-gpc0(0) if { req.hdr(user-agent) -m sub "sqlmap" }
-    
-    # Block after 3 suspicious requests
-    http-request deny deny_status 403 if { sc_get_gpc0(0) gt 3 }
-    
-    server web1 192.168.1.10:80 check</pre>
-                    <h4>How to Test:</h4>
-                    <ol>
-                        <li>Go to <strong>📋 Headers</strong> tab</li>
-                        <li>Add header: <code>User-Agent</code> = <code>sqlmap/1.0</code></li>
-                        <li>Click "Test Request"</li>
-                        <li>Repeat 4-5 times</li>
-                        <li><strong>Expected:</strong> First few succeed, then 403 (blocked)</li>
-                    </ol>
-                </div>
-            </div>
-
-            <div class="section">
-                <div class="section-header" data-section-id="haproxy_8">
-                    <span><strong>8. Slowloris Attack Protection</strong></span>
-                    <span id="haproxy_8_icon" class="section-icon">▼</span>
-                </div>
-                <div class="section-content" id="haproxy_8">
-                    <p><strong>Use Case:</strong> Protect against slow HTTP attacks</p>
-                    <pre>frontend http_front
-    bind *:80
-    
-    # Limit slow connections
-    stick-table type ip size 100k expire 30s store conn_cur,conn_rate(10s)
-    tcp-request connection track-sc0 src
-    
-    # Block if too many slow connections
-    tcp-request connection reject if { sc_conn_cur(0) gt 5 } { sc_conn_rate(0) lt 2 }
-    
-    # Timeouts to prevent slow attacks
-    timeout client 10s
-    timeout http-request 5s
-    
-    default_backend web_backend</pre>
-                    <h4>How to Test:</h4>
-                    <ol>
-                        <li>Go to <strong>⚡ Parallel</strong> tab</li>
-                        <li>Set: 10 connections, 20 seconds hold</li>
-                        <li>Check "Force New Connections"</li>
-                        <li>Click "Start Test"</li>
-                        <li><strong>Expected:</strong> Connections timeout after 10s (client timeout)</li>
-                    </ol>
-                </div>
-            </div>
-
-            <div class="section">
-                <div class="section-header" data-section-id="haproxy_9">
-                    <span><strong>9. Geographic Rate Limiting (with IP ranges)</strong></span>
-                    <span id="haproxy_9_icon" class="section-icon">▼</span>
-                </div>
-                <div class="section-content" id="haproxy_9">
-                    <p><strong>Use Case:</strong> Different rate limits for different IP ranges/countries</p>
-                    <pre>backend api_backend
-    stick-table type ip size 200k expire 60s store http_req_rate(10s)
-    http-request track-sc0 src
-    
-    # Stricter limits for external IPs
-    acl is_external src 0.0.0.0/0
-    acl is_internal src 192.168.0.0/16 10.0.0.0/8
-    
-    # External: 50 req/10s, Internal: 500 req/10s
-    http-request deny deny_status 429 if is_external { sc_http_req_rate(0) gt 50 }
-    http-request deny deny_status 429 if is_internal { sc_http_req_rate(0) gt 500 }
-    
-    server api1 192.168.1.10:80 check</pre>
-                    <h4>How to Test:</h4>
-                    <ol>
-                        <li>Check your IP in <strong>📊 Server Info</strong> tab (Client IP)</li>
-                        <li>Adjust ACL in HAProxy to match your IP range</li>
-                        <li>Go to <strong>🔥 Stress Test</strong></li>
-                        <li>Run 100 requests</li>
-                        <li><strong>Expected:</strong> Different limit based on your IP</li>
-                    </ol>
-                </div>
-            </div>
-
-            <div class="section">
-                <div class="section-header" data-section-id="haproxy_10">
-                    <span><strong>10. Combined Multi-Factor Protection</strong></span>
-                    <span id="haproxy_10_icon" class="section-icon">▼</span>
-                </div>
-                <div class="section-content" id="haproxy_10">
-                    <p><strong>Use Case:</strong> Comprehensive protection combining multiple metrics</p>
-                    <pre>backend protected_backend
-    # Track multiple metrics
-    stick-table type ip size 100k expire 10m store \\
-        http_req_rate(10s),http_err_rate(10s),conn_rate(10s),bytes_in_rate(60s),gpc0
-    
-    http-request track-sc0 src
-    
-    # Multiple protection layers
-    
-    # 1. Request rate
-    http-request deny deny_status 429 if { sc_http_req_rate(0) gt 100 }
-    
-    # 2. Error rate (failed auth, 404s)
-    http-request deny deny_status 429 if { sc_http_err_rate(0) gt 10 }
-    
-    # 3. Upload bandwidth
-    http-request deny deny_status 429 if { sc_bytes_in_rate(0) gt 10000000 }
-    
-    # 4. Custom suspicious behavior counter
-    http-request sc-inc-gpc0(0) if { path_beg /admin } !{ src 192.168.1.0/24 }
-    http-request deny deny_status 403 if { sc_get_gpc0(0) gt 5 }
-    
-    server backend1 192.168.1.10:80 check</pre>
-                    <h4>How to Test:</h4>
-                    <ol>
-                        <li>This combines all previous tests</li>
-                        <li>Try triggering each limit individually</li>
-                        <li>Use <strong>Stress Test</strong> for request rate</li>
-                        <li>Use <strong>Auth Test</strong> for error rate</li>
-                        <li>Use <strong>Upload Test</strong> for bandwidth</li>
-                        <li><strong>Expected:</strong> Multiple layers of protection active</li>
-                    </ol>
-                </div>
-            </div>
-
-            <div style="margin-top: 30px; padding: 20px; background: #2d2d2d; border-radius: 5px; border-left: 4px solid #ffb86c;">
-                <h3 style="color: #ffb86c; margin-top: 0;">💡 Pro Tips</h3>
-                <ul>
-                    <li><strong>Start simple:</strong> Test one stick-table metric at a time</li>
-                    <li><strong>Monitor HAProxy stats:</strong> Access <code>http://haproxy-ip:stats</code> to see stick-table contents</li>
-                    <li><strong>Adjust timing:</strong> Use short expire times (30s) for testing, longer (10m-1h) for production</li>
-                    <li><strong>Combine metrics:</strong> Real protection uses multiple stick-table counters together</li>
-                    <li><strong>Test from different IPs:</strong> Use VPN or multiple machines to test properly</li>
-                </ul>
-            </div>
         </div>
     </div>
 

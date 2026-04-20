@@ -83,7 +83,7 @@ networks:
       parent: eth0
       macvlan_mode: bridge
     ipam:
-    driver: default
+      driver: default
       config:
         - subnet: 192.168.10.0/24
           gateway: 192.168.10.1
